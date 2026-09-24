@@ -25,6 +25,8 @@ footer{border-top:1px solid var(--line);padding:35px 0;color:#737b86;display:fle
 
 .fields.three{grid-template-columns:repeat(3,1fr)}.mini{color:var(--muted);font-size:13px;line-height:1.5;margin:-4px 0 18px}.upgradegrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.upgrade{background:#0b0e12;border:1px solid #252b33;border-radius:12px;padding:12px}.upgrade label{color:#eef1f5}.budgetline{display:flex;align-items:end;justify-content:space-between;gap:15px}.budgetline span{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px}.meter{height:10px;background:#080a0d;border:1px solid #2b313a;border-radius:999px;overflow:hidden;margin:4px 0 10px}.meter div{height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--hot));transition:.25s}.budgetstatus{font-weight:800;font-size:13px;margin-bottom:18px}.good{color:var(--green)}.warn{color:var(--hot2)}.planbox{margin-top:20px;padding:18px;border:1px solid #2b313a;border-radius:14px;background:#0b0e12}.planbox h3{font-size:14px;margin:0 0 8px}.planbox p,.planbox ol{color:#aeb6c1;line-height:1.6;font-size:13px}.planbox ol{padding-left:20px;margin-bottom:0}
 @media(max-width:850px){.fields.three,.upgradegrid{grid-template-columns:1fr}.budgetline{display:block}.total{font-size:44px}}
+
+.vehicleintel,.fitmentbox{margin:2px 0 18px;padding:15px;border:1px solid #343b45;border-radius:12px;background:#0b0e12;color:#aeb6c1;font-size:13px;line-height:1.55}.vehicleintel b{color:#fff}.fitmentbox{margin-top:18px}.fitmentbox h3{margin:7px 0 12px}.rec{padding:9px 0;border-top:1px solid #252b33}.rec:first-of-type{border-top:0}.rec b{color:#fff}.rec span{display:block;color:#8f98a4;margin-top:3px}.fitnote{color:var(--hot2);font-weight:800}
 </style>
 </head>
 <body>
@@ -34,10 +36,12 @@ footer{border-top:1px solid var(--line);padding:35px 0;color:#737b86;display:fle
 <div><div class="eyebrow">Custom vehicle platform</div><h1>MAKE YOUR<br>IDEA A BEAST.</h1><p>Plan your next truck, car, rat rod, off-road rig or audio monster. Choose the style, set the budget, and turn the idea into a build plan.</p><div class="actions"><a class="btn" href="#builder">Build My Vehicle</a><a class="btn ghost" href="#business">See The Business</a></div></div>
 <div class="visual"><div class="car"><div class="cab"><div class="glass g1"></div><div class="glass g2"></div></div><div class="wheel w1"></div><div class="wheel w2"></div><div class="lamp"></div></div><div class="visualtag">OFF-ROAD // STREET // RAT ROD // SHOW</div></div>
 </header>
-<section id="builder"><div class="head"><div><div class="eyebrow">01 — Build planner V2</div><h2>Build Your Beast</h2></div><p>Choose your vehicle, style, budget and upgrade levels. Your estimate updates live and shows how the plan fits your target budget.</p></div>
+<section id="builder"><div class="head"><div><div class="eyebrow">01 — Vehicle-aware builder V3</div><h2>Build Your Beast</h2></div><p>Start with a supported vehicle profile or enter your own. BuildMyBeast adjusts recommendations and planning notes around the platform you choose.</p></div>
 <div class="builder">
 <div class="panel">
 <h3>1. Vehicle</h3>
+<div class="field"><label>Vehicle Profile</label><select id="vehicleProfile"><option value="tahoe">2000–2006 Chevrolet Tahoe / GMC Yukon</option><option value="silverado">1999–2006 Chevrolet Silverado / GMC Sierra 1500</option><option value="f150">2004–2008 Ford F-150</option><option value="wrangler">2007–2018 Jeep Wrangler JK</option><option value="mustang">2005–2014 Ford Mustang</option><option value="custom">Other / Custom Vehicle</option></select></div>
+<div class="vehicleintel" id="vehicleintel"></div>
 <div class="fields three"><div class="field"><label>Year</label><input id="year" type="number" min="1900" max="2030" value="2005"></div><div class="field"><label>Make</label><input id="make" value="Chevrolet"></div><div class="field"><label>Model</label><input id="model" value="Tahoe"></div></div>
 <div class="fields"><div class="field"><label>Build Style</label><select id="style"><option>Street / Show</option><option>Off-Road</option><option>Rat Rod</option><option>Mad Max</option><option>Audio Monster</option><option>Performance</option><option>Overland</option></select></div><div class="field"><label>Target Budget</label><select id="budget"><option value="3000">$3,000</option><option value="5000">$5,000</option><option value="10000" selected>$10,000</option><option value="15000">$15,000</option><option value="20000">$20,000</option><option value="30000">$30,000+</option></select></div></div>
 <h3>2. Upgrade Levels</h3>
@@ -52,6 +56,7 @@ footer{border-top:1px solid var(--line);padding:35px 0;color:#737b86;display:fle
 <div class="budgetline"><span>Estimated upgrades</span><div class="total" id="total">$0</div></div>
 <div class="meter"><div id="meterfill"></div></div><div class="budgetstatus" id="budgetstatus"></div>
 <div id="rows"></div><div class="chips" id="chips"></div>
+<div class="fitmentbox"><div class="eyebrow">Vehicle intelligence</div><h3>Platform Recommendations</h3><div id="recommendations"></div></div>
 <div class="planbox"><h3>Build Strategy</h3><p id="strategy"></p><h3>Suggested Order</h3><ol id="order"></ol></div>
 <p class="notice">Planning estimate only. Labor, taxes, shipping, fabrication and vehicle-specific fitment are not included. Future versions can connect these categories to real products, shops and affiliate catalogs.</p>
 <div class="actions"><button class="btn" onclick="shareBuild()">Copy Full Build Plan</button><button class="btn ghost" onclick="saveLocal()">Save This Build</button></div>
@@ -68,44 +73,46 @@ footer{border-top:1px solid var(--line);padding:35px 0;color:#737b86;display:fle
 const $=id=>document.getElementById(id);
 const fmt=n=>Number(n).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0});
 const categoryNames={wheels:'Wheels & Tires',suspension:'Suspension',performance:'Performance',audio:'Audio',exterior:'Exterior',lighting:'Lighting',interior:'Interior',exhaust:'Exhaust'};
+const profiles={
+ tahoe:{year:2005,make:'Chevrolet',model:'Tahoe',label:'GMT800 full-size SUV',intel:'Strong platform for street/show, audio and mild off-road builds. Large cabin favors serious audio systems; wheel/tire and suspension fitment should be checked together.',recs:{wheels:'Common custom direction: 20–26 in street/show wheels or smaller wheels with more tire sidewall for off-road use.',suspension:'Plan suspension before final wheel/tire fitment. Lowered street builds and lifted off-road builds need different geometry.',performance:'5.3L V8 trucks commonly respond to intake/exhaust/tuning paths; verify exact engine/RPO before ordering.',audio:'Large cargo area can support dual-subwoofer enclosures, but high-output systems may require electrical upgrades.',exterior:'Blacked-out trim, lighting and paint/wrap changes suit this body style well.',lighting:'LED exterior upgrades are common; confirm housing and local road-use requirements.',interior:'Seats, trim and head-unit upgrades can modernize the cabin.',exhaust:'Cat-back style upgrades are a common starting point; verify wheelbase/engine fitment.'}},
+ silverado:{year:2005,make:'Chevrolet',model:'Silverado 1500',label:'GMT800 full-size pickup',intel:'Excellent street-truck, lowered, off-road and performance platform with broad aftermarket support.',recs:{wheels:'Wheel diameter, offset and tire width should be chosen around ride height.',suspension:'Lowering kits and lift/leveling setups are both common; choose stance first.',performance:'Engine options vary widely. Confirm VIN/engine before matching intake, exhaust or tuning parts.',audio:'Cab configuration changes enclosure space; regular, extended and crew cabs need different plans.',exterior:'Roll pans, grilles, lighting and paint/wrap changes can dramatically change the truck.',lighting:'Verify bulb/housing compatibility by year and trim.',interior:'Head unit, upholstery and console work are strong upgrade paths.',exhaust:'Engine and cab/bed configuration can affect exhaust fitment.'}},
+ f150:{year:2006,make:'Ford',model:'F-150',label:'11th-gen full-size pickup',intel:'Versatile platform for street, off-road and audio builds. Cab, drivetrain and engine configuration matter heavily for parts selection.',recs:{wheels:'Offset and tire diameter affect rubbing and stance; verify with suspension setup.',suspension:'Leveling, lift and lowering choices should be matched to 2WD/4WD configuration.',performance:'Confirm engine (4.2/4.6/5.4 depending configuration) before selecting power parts.',audio:'Cab style determines subwoofer enclosure space and seat clearance.',exterior:'Grilles, bumpers, lighting and wheel stance offer major visual changes.',lighting:'Confirm year-specific housings and wiring.',interior:'Modern head units and upholstery refreshes work well on this generation.',exhaust:'Match exhaust to engine, wheelbase and cab/bed configuration.'}},
+ wrangler:{year:2012,make:'Jeep',model:'Wrangler JK',label:'Jeep Wrangler JK',intel:'Off-road-focused platform where tire size, gearing, lift height and steering geometry should be planned as one system.',recs:{wheels:'Prioritize tire diameter, sidewall and backspacing over wheel diameter for trail use.',suspension:'Lift height affects steering/driveline geometry; larger lifts may require supporting components.',performance:'Power modifications should account for tire size and gearing; exact engine depends on model year.',audio:'Weather resistance and removable-top acoustics matter more than raw speaker count.',exterior:'Bumpers, armor, fenders and recovery points are functional as well as visual.',lighting:'Auxiliary trail lighting needs proper relays/fusing and road-legal use.',interior:'Durable/washable materials and secure storage suit trail builds.',exhaust:'Protect ground clearance and departure angle on off-road builds.'}},
+ mustang:{year:2011,make:'Ford',model:'Mustang',label:'S197 performance coupe',intel:'Performance/street platform where wheel/tire grip, suspension and power should be balanced instead of treated independently.',recs:{wheels:'Choose tire compound and width with power goals; verify offset and brake clearance.',suspension:'Springs/coilovers, dampers and alignment should be planned together.',performance:'Engine varies by year/trim; confirm V6/GT and exact engine before power modifications.',audio:'Trunk space limits enclosure size compared with SUVs/trucks; plan weight and cargo use.',exterior:'Wheels, stance, aero and lighting create strong visual impact without overcomplication.',lighting:'Use year-correct housings and maintain safe beam pattern.',interior:'Seats, steering controls and infotainment are common driver-focused upgrades.',exhaust:'Axle-back/cat-back options vary by engine and year.'}},
+ custom:{year:'',make:'',model:'',label:'Custom vehicle',intel:'Enter your exact vehicle. Recommendations remain general until BuildMyBeast has a dedicated profile for that platform.',recs:{}}
+};
+function profile(){return profiles[$('vehicleProfile').value]||profiles.custom}
+function applyProfile(){
+ let p=profile();if($('vehicleProfile').value!=='custom'){$('year').value=p.year;$('make').value=p.make;$('model').value=p.model}
+ $('vehicleintel').innerHTML='<b>'+p.label+'</b><br>'+p.intel;render();
+}
 function currentBuild(){
-  let items=[],total=0;
-  document.querySelectorAll('.upgradeSelect').forEach(x=>{let p=+x.value;if(p>0){let label=x.options[x.selectedIndex].text.split(' — ')[0];items.push({name:categoryNames[x.id],level:label,price:p});total+=p}});
-  return {year:$('year').value||'Custom',make:$('make').value.trim()||'Custom',model:$('model').value.trim()||'Vehicle',style:$('style').value,budget:+$('budget').value,items,total};
+ let items=[],total=0;document.querySelectorAll('.upgradeSelect').forEach(x=>{let p=+x.value;if(p>0){let label=x.options[x.selectedIndex].text.split(' — ')[0];items.push({id:x.id,name:categoryNames[x.id],level:label,price:p});total+=p}});
+ return {year:$('year').value||'Custom',make:$('make').value.trim()||'Custom',model:$('model').value.trim()||'Vehicle',style:$('style').value,budget:+$('budget').value,items,total,profile:$('vehicleProfile').value};
 }
 function strategyFor(b){
-  if(!b.items.length)return 'Start by choosing at least one upgrade category. Focus on the changes that define the vehicle first, then layer in cosmetic details.';
-  let biggest=[...b.items].sort((a,z)=>z.price-a.price)[0];
-  let msg='Build around '+biggest.name.toLowerCase()+' as the anchor of this '+b.style.toLowerCase()+' project. ';
-  msg+=b.total<=b.budget?'The current plan leaves room in the target budget for labor, fitment surprises and finishing details.':'The current parts estimate is over target, so reduce one or two upgrade levels before buying parts.';
-  return msg;
+ if(!b.items.length)return 'Start by choosing at least one upgrade category. Focus on the changes that define the vehicle first, then layer in cosmetic details.';
+ let biggest=[...b.items].sort((a,z)=>z.price-a.price)[0],msg='Build around '+biggest.name.toLowerCase()+' as the anchor of this '+b.style.toLowerCase()+' project. ';
+ msg+=b.total<=b.budget?'The current plan leaves room in the target budget for labor, fitment surprises and finishing details.':'The current parts estimate is over target, so reduce one or two upgrade levels before buying parts.';
+ return msg;
+}
+function renderRecommendations(b){
+ let p=profiles[b.profile]||profiles.custom;if(!b.items.length){$('recommendations').innerHTML='<div class="rec"><span>Select upgrades to see platform-specific planning notes.</span></div>';return}
+ $('recommendations').innerHTML=b.items.map(i=>'<div class="rec"><b>'+i.name+'</b><span>'+(p.recs[i.id]||'Verify exact trim, dimensions and compatibility before purchasing parts.')+'</span></div>').join('')+'<div class="rec fitnote">Fitment note: These are planning recommendations, not guaranteed part fitment. Verify VIN, trim, drivetrain, dimensions and manufacturer specifications before purchase or installation.</div>';
 }
 function render(){
-  let b=currentBuild(),rows='',chips='';
-  b.items.forEach(i=>{rows+=`<div class="row"><span>${i.name} · ${i.level}</span><strong>${fmt(i.price)}</strong></div>`;chips+=`<span class="chip">${i.name}</span>`});
-  $('buildtitle').textContent=`${b.year} ${b.make} ${b.model} — ${b.style}`;
-  $('total').textContent=fmt(b.total);$('rows').innerHTML=rows||'<div class="row"><span>No upgrades selected</span><strong>$0</strong></div>';$('chips').innerHTML=chips;
-  let remaining=b.budget-b.total,pct=Math.min(100,(b.total/b.budget)*100);$('meterfill').style.width=pct+'%';
-  $('budgetstatus').className='budgetstatus '+(remaining>=0?'good':'warn');
-  $('budgetstatus').textContent=remaining>=0?`${fmt(remaining)} remaining from ${fmt(b.budget)} target budget`:`${fmt(Math.abs(remaining))} over the ${fmt(b.budget)} target budget`;
-  $('strategy').textContent=strategyFor(b);
-  let order=[...b.items].sort((a,z)=>z.price-a.price);$('order').innerHTML=order.length?order.map((i,n)=>`<li>Phase ${n+1}: ${i.name} — ${i.level} (${fmt(i.price)})</li>`).join(''):'<li>Select upgrades to create a suggested build order.</li>';
+ let b=currentBuild(),rows='',chips='';b.items.forEach(i=>{rows+=`<div class="row"><span>${i.name} · ${i.level}</span><strong>${fmt(i.price)}</strong></div>`;chips+=`<span class="chip">${i.name}</span>`});
+ $('buildtitle').textContent=`${b.year} ${b.make} ${b.model} — ${b.style}`;$('total').textContent=fmt(b.total);$('rows').innerHTML=rows||'<div class="row"><span>No upgrades selected</span><strong>$0</strong></div>';$('chips').innerHTML=chips;
+ let remaining=b.budget-b.total,pct=Math.min(100,(b.total/b.budget)*100);$('meterfill').style.width=pct+'%';$('budgetstatus').className='budgetstatus '+(remaining>=0?'good':'warn');$('budgetstatus').textContent=remaining>=0?`${fmt(remaining)} remaining from ${fmt(b.budget)} target budget`:`${fmt(Math.abs(remaining))} over the ${fmt(b.budget)} target budget`;
+ $('strategy').textContent=strategyFor(b);let order=[...b.items].sort((a,z)=>z.price-a.price);$('order').innerHTML=order.length?order.map((i,n)=>`<li>Phase ${n+1}: ${i.name} — ${i.level} (${fmt(i.price)})</li>`).join(''):'<li>Select upgrades to create a suggested build order.</li>';renderRecommendations(b);
 }
-function generatePlan(){render();toast('Build plan generated')}
-function resetBuild(){
-  $('year').value='2005';$('make').value='Chevrolet';$('model').value='Tahoe';$('style').value='Street / Show';$('budget').value='10000';
-  document.querySelectorAll('.upgradeSelect').forEach(x=>x.selectedIndex=0);
-  $('wheels').selectedIndex=2;$('suspension').selectedIndex=1;$('exterior').selectedIndex=1;$('audio').selectedIndex=2;render();toast('Builder reset');
-}
-function shareBuild(){
-  let b=currentBuild();let lines=[`${b.year} ${b.make} ${b.model} — ${b.style}`,`Target budget: ${fmt(b.budget)}`,`Estimated upgrades: ${fmt(b.total)}`,'',...b.items.map(i=>`• ${i.name}: ${i.level} — ${fmt(i.price)}`),'',`Build strategy: ${strategyFor(b)}`];
-  let t=lines.join('\n');navigator.clipboard?.writeText(t).then(()=>toast('Full build plan copied!')).catch(()=>toast('Copy unavailable on this browser'));
-}
-function saveLocal(){let b=currentBuild();localStorage.setItem('buildmybeast-build',JSON.stringify(b));toast('Build saved on this device')}
+function generatePlan(){render();toast('Vehicle-aware build plan generated')}
+function resetBuild(){$('vehicleProfile').value='tahoe';$('style').value='Street / Show';$('budget').value='10000';document.querySelectorAll('.upgradeSelect').forEach(x=>x.selectedIndex=0);$('wheels').selectedIndex=2;$('suspension').selectedIndex=1;$('exterior').selectedIndex=1;$('audio').selectedIndex=2;applyProfile();toast('Builder reset')}
+function shareBuild(){let b=currentBuild(),p=profiles[b.profile]||profiles.custom;let lines=[`${b.year} ${b.make} ${b.model} — ${b.style}`,`Platform: ${p.label}`,`Target budget: ${fmt(b.budget)}`,`Estimated upgrades: ${fmt(b.total)}`,'',...b.items.map(i=>`• ${i.name}: ${i.level} — ${fmt(i.price)}\n  ${p.recs[i.id]||''}`),'',`Build strategy: ${strategyFor(b)}`,'','Verify exact fitment before purchasing parts.'];navigator.clipboard?.writeText(lines.join('\n')).then(()=>toast('Full build plan copied!')).catch(()=>toast('Copy unavailable on this browser'))}
+function saveLocal(){localStorage.setItem('buildmybeast-build',JSON.stringify(currentBuild()));toast('Build saved on this device')}
 function join(){let e=$('email').value;if(!e||!e.includes('@')){toast('Enter a valid email');return}toast('Demo signup complete — connect an email service to make this live')}
 function toast(t){let x=$('toast');x.textContent=t;x.style.display='block';setTimeout(()=>x.style.display='none',2300)}
-['year','make','model','style','budget'].forEach(id=>$(id)?.addEventListener('input',render));document.querySelectorAll('.upgradeSelect').forEach(x=>x.addEventListener('change',render));
-resetBuild();
+$('vehicleProfile').addEventListener('change',applyProfile);['year','make','model','style','budget'].forEach(id=>$(id)?.addEventListener('input',render));document.querySelectorAll('.upgradeSelect').forEach(x=>x.addEventListener('change',render));resetBuild();
 </script>
 </body>
 </html>
