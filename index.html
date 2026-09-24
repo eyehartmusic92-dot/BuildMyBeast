@@ -22,6 +22,9 @@ section{padding:82px 0}.head{display:flex;justify-content:space-between;align-it
 footer{border-top:1px solid var(--line);padding:35px 0;color:#737b86;display:flex;justify-content:space-between;gap:20px;font-size:12px}
 .toast{display:none;position:fixed;right:20px;bottom:20px;background:#1a1e25;border:1px solid #3a414c;padding:14px 18px;border-radius:10px;z-index:30}
 @media(max-width:850px){.hero,.builder,.revenue{grid-template-columns:1fr}.features,.gallery{grid-template-columns:1fr}.navlinks{display:none}.fields{grid-template-columns:1fr}.hero{padding:55px 0}.visual{height:350px}.hero h1{letter-spacing:-2px}.emailbox{flex-direction:column}}
+
+.fields.three{grid-template-columns:repeat(3,1fr)}.mini{color:var(--muted);font-size:13px;line-height:1.5;margin:-4px 0 18px}.upgradegrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.upgrade{background:#0b0e12;border:1px solid #252b33;border-radius:12px;padding:12px}.upgrade label{color:#eef1f5}.budgetline{display:flex;align-items:end;justify-content:space-between;gap:15px}.budgetline span{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px}.meter{height:10px;background:#080a0d;border:1px solid #2b313a;border-radius:999px;overflow:hidden;margin:4px 0 10px}.meter div{height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--hot));transition:.25s}.budgetstatus{font-weight:800;font-size:13px;margin-bottom:18px}.good{color:var(--green)}.warn{color:var(--hot2)}.planbox{margin-top:20px;padding:18px;border:1px solid #2b313a;border-radius:14px;background:#0b0e12}.planbox h3{font-size:14px;margin:0 0 8px}.planbox p,.planbox ol{color:#aeb6c1;line-height:1.6;font-size:13px}.planbox ol{padding-left:20px;margin-bottom:0}
+@media(max-width:850px){.fields.three,.upgradegrid{grid-template-columns:1fr}.budgetline{display:block}.total{font-size:44px}}
 </style>
 </head>
 <body>
@@ -31,20 +34,28 @@ footer{border-top:1px solid var(--line);padding:35px 0;color:#737b86;display:fle
 <div><div class="eyebrow">Custom vehicle platform</div><h1>MAKE YOUR<br>IDEA A BEAST.</h1><p>Plan your next truck, car, rat rod, off-road rig or audio monster. Choose the style, set the budget, and turn the idea into a build plan.</p><div class="actions"><a class="btn" href="#builder">Build My Vehicle</a><a class="btn ghost" href="#business">See The Business</a></div></div>
 <div class="visual"><div class="car"><div class="cab"><div class="glass g1"></div><div class="glass g2"></div></div><div class="wheel w1"></div><div class="wheel w2"></div><div class="lamp"></div></div><div class="visualtag">OFF-ROAD // STREET // RAT ROD // SHOW</div></div>
 </header>
-<section id="builder"><div class="head"><div><div class="eyebrow">01 — Build planner</div><h2>Build Your Beast</h2></div><p>This working prototype creates a build estimate from the options you choose. Production version can connect recommendations to real products and affiliate links.</p></div>
+<section id="builder"><div class="head"><div><div class="eyebrow">01 — Build planner V2</div><h2>Build Your Beast</h2></div><p>Choose your vehicle, style, budget and upgrade levels. Your estimate updates live and shows how the plan fits your target budget.</p></div>
 <div class="builder">
-<div class="panel"><h3>Vehicle</h3><div class="fields"><div class="field"><label>Year</label><input id="year" type="number" value="2005"></div><div class="field"><label>Make / Model</label><input id="model" value="Chevy Tahoe"></div></div>
-<div class="fields"><div class="field"><label>Style</label><select id="style"><option>Off-Road</option><option>Street</option><option>Rat Rod</option><option>Mad Max</option><option>Show Truck</option><option>Audio Build</option></select></div><div class="field"><label>Target Budget</label><select id="budget"><option value="3000">$3,000</option><option value="5000" selected>$5,000</option><option value="10000">$10,000</option><option value="20000">$20,000+</option></select></div></div>
-<h3>Choose upgrades</h3>
-<label class="check"><input class="up" type="checkbox" data-name="Wheels & tires" data-price="1500" checked> Wheels & tires</label>
-<label class="check"><input class="up" type="checkbox" data-name="Suspension / lift" data-price="1800"> Suspension / lift</label>
-<label class="check"><input class="up" type="checkbox" data-name="Lighting" data-price="900"> Lighting</label>
-<label class="check"><input class="up" type="checkbox" data-name="Exhaust" data-price="1200"> Exhaust</label>
-<label class="check"><input class="up" type="checkbox" data-name="Audio system" data-price="1800"> Audio system</label>
-<label class="check"><input class="up" type="checkbox" data-name="Interior" data-price="1000"> Interior</label>
-<div class="actions"><button class="btn" onclick="build()">Generate Build</button><button class="btn ghost" onclick="resetBuild()">Reset</button></div></div>
-<div class="panel summary"><div class="eyebrow">Your build</div><h3 id="buildtitle">2005 Chevy Tahoe — Off-Road</h3><div class="total" id="total">$1,500</div><div id="rows"></div><div class="chips" id="chips"></div><p class="notice">Estimate only. Prices are placeholders until real retailer feeds/affiliate catalogs are connected. Labor, taxes, shipping and vehicle-specific fitment are not included.</p><button class="btn ghost" onclick="shareBuild()">Copy Build Summary</button></div>
-</div></section>
+<div class="panel">
+<h3>1. Vehicle</h3>
+<div class="fields three"><div class="field"><label>Year</label><input id="year" type="number" min="1900" max="2030" value="2005"></div><div class="field"><label>Make</label><input id="make" value="Chevrolet"></div><div class="field"><label>Model</label><input id="model" value="Tahoe"></div></div>
+<div class="fields"><div class="field"><label>Build Style</label><select id="style"><option>Street / Show</option><option>Off-Road</option><option>Rat Rod</option><option>Mad Max</option><option>Audio Monster</option><option>Performance</option><option>Overland</option></select></div><div class="field"><label>Target Budget</label><select id="budget"><option value="3000">$3,000</option><option value="5000">$5,000</option><option value="10000" selected>$10,000</option><option value="15000">$15,000</option><option value="20000">$20,000</option><option value="30000">$30,000+</option></select></div></div>
+<h3>2. Upgrade Levels</h3>
+<p class="mini">Choose a level for each category. Prices are planning estimates, not retailer quotes.</p>
+<div class="upgradegrid">
+<div class="upgrade"><label>Wheels & Tires</label><select class="upgradeSelect" id="wheels"><option value="0">Skip — $0</option><option value="1500">Clean Upgrade — $1,500</option><option value="2800">Aggressive Setup — $2,800</option><option value="4500">Show Setup — $4,500</option></select></div><div class="upgrade"><label>Suspension</label><select class="upgradeSelect" id="suspension"><option value="0">Skip — $0</option><option value="1200">Mild — $1,200</option><option value="2400">Performance / Lift — $2,400</option><option value="4000">Full Setup — $4,000</option></select></div><div class="upgrade"><label>Performance</label><select class="upgradeSelect" id="performance"><option value="0">Skip — $0</option><option value="900">Bolt-ons — $900</option><option value="2500">Stage Build — $2,500</option><option value="5000">Serious Power — $5,000</option></select></div><div class="upgrade"><label>Audio</label><select class="upgradeSelect" id="audio"><option value="0">Skip — $0</option><option value="800">Daily Upgrade — $800</option><option value="1800">Big Bass — $1,800</option><option value="3500">Window Shaker — $3,500</option></select></div><div class="upgrade"><label>Exterior</label><select class="upgradeSelect" id="exterior"><option value="0">Skip — $0</option><option value="700">Blacked Out — $700</option><option value="1800">Custom Styling — $1,800</option><option value="4000">Show Finish — $4,000</option></select></div><div class="upgrade"><label>Lighting</label><select class="upgradeSelect" id="lighting"><option value="0">Skip — $0</option><option value="350">LED Refresh — $350</option><option value="900">Custom Lighting — $900</option><option value="1800">Full Show Lighting — $1,800</option></select></div><div class="upgrade"><label>Interior</label><select class="upgradeSelect" id="interior"><option value="0">Skip — $0</option><option value="600">Refresh — $600</option><option value="1800">Custom Interior — $1,800</option><option value="3500">Full Interior — $3,500</option></select></div><div class="upgrade"><label>Exhaust</label><select class="upgradeSelect" id="exhaust"><option value="0">Skip — $0</option><option value="500">Muffler / Tips — $500</option><option value="1200">Cat-back — $1,200</option><option value="2200">Custom System — $2,200</option></select></div>
+</div>
+<div class="actions"><button class="btn" onclick="generatePlan()">Generate Build Plan</button><button class="btn ghost" onclick="resetBuild()">Reset</button></div>
+</div>
+<div class="panel summary">
+<div class="eyebrow">Your build plan</div><h3 id="buildtitle">2005 Chevrolet Tahoe — Street / Show</h3>
+<div class="budgetline"><span>Estimated upgrades</span><div class="total" id="total">$0</div></div>
+<div class="meter"><div id="meterfill"></div></div><div class="budgetstatus" id="budgetstatus"></div>
+<div id="rows"></div><div class="chips" id="chips"></div>
+<div class="planbox"><h3>Build Strategy</h3><p id="strategy"></p><h3>Suggested Order</h3><ol id="order"></ol></div>
+<p class="notice">Planning estimate only. Labor, taxes, shipping, fabrication and vehicle-specific fitment are not included. Future versions can connect these categories to real products, shops and affiliate catalogs.</p>
+<div class="actions"><button class="btn" onclick="shareBuild()">Copy Full Build Plan</button><button class="btn ghost" onclick="saveLocal()">Save This Build</button></div>
+</div></div></section>
 <section id="gallery"><div class="head"><div><div class="eyebrow">02 — Inspiration</div><h2>Beast Gallery</h2></div><p>Once launched, this can become a community feed where users post builds, parts lists and finished projects.</p></div>
 <div class="gallery"><div class="buildcard"><div class="thumb"></div><div class="inside"><div class="tag">Off-Road</div><h3>Trail Monster</h3><p>Lift + wheels + tires + lighting</p></div></div><div class="buildcard"><div class="thumb"></div><div class="inside"><div class="tag">Audio</div><h3>Window Shaker</h3><p>Big bass + upgraded electrical</p></div></div><div class="buildcard"><div class="thumb"></div><div class="inside"><div class="tag">Mad Max</div><h3>Wasteland Rig</h3><p>Custom fabrication + aggressive styling</p></div></div></div></section>
 <section id="business"><div class="head"><div><div class="eyebrow">03 — Revenue engine</div><h2>Turn build intent into revenue.</h2></div></div>
@@ -54,12 +65,47 @@ footer{border-top:1px solid var(--line);padding:35px 0;color:#737b86;display:fle
 <footer class="wrap"><span>© 2026 BuildMyBeast</span><span>Built for custom vehicle culture</span></footer>
 <div class="toast" id="toast"></div>
 <script>
-const $=id=>document.getElementById(id);const fmt=n=>n.toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0});
-function build(){let y=$('year').value||'Custom',m=$('model').value||'Vehicle',s=$('style').value,total=0,rows='',chips='';document.querySelectorAll('.up').forEach(x=>{if(x.checked){let p=+x.dataset.price;total+=p;rows+=`<div class="row"><span>${x.dataset.name}</span><strong>${fmt(p)}</strong></div>`;chips+=`<span class="chip">${x.dataset.name}</span>`}});$('buildtitle').textContent=`${y} ${m} — ${s}`;$('total').textContent=fmt(total);$('rows').innerHTML=rows||'<div class="row"><span>No upgrades selected</span><strong>$0</strong></div>';$('chips').innerHTML=chips;toast('Build generated')}
-function resetBuild(){document.querySelectorAll('.up').forEach(x=>x.checked=x.dataset.name==='Wheels & tires');$('year').value='2005';$('model').value='Chevy Tahoe';$('style').value='Off-Road';build()}
-function shareBuild(){let t=`${$('buildtitle').textContent} — ${$('total').textContent}`;navigator.clipboard?.writeText(t).then(()=>toast('Build summary copied!')).catch(()=>toast(t))}
+const $=id=>document.getElementById(id);
+const fmt=n=>Number(n).toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0});
+const categoryNames={wheels:'Wheels & Tires',suspension:'Suspension',performance:'Performance',audio:'Audio',exterior:'Exterior',lighting:'Lighting',interior:'Interior',exhaust:'Exhaust'};
+function currentBuild(){
+  let items=[],total=0;
+  document.querySelectorAll('.upgradeSelect').forEach(x=>{let p=+x.value;if(p>0){let label=x.options[x.selectedIndex].text.split(' — ')[0];items.push({name:categoryNames[x.id],level:label,price:p});total+=p}});
+  return {year:$('year').value||'Custom',make:$('make').value.trim()||'Custom',model:$('model').value.trim()||'Vehicle',style:$('style').value,budget:+$('budget').value,items,total};
+}
+function strategyFor(b){
+  if(!b.items.length)return 'Start by choosing at least one upgrade category. Focus on the changes that define the vehicle first, then layer in cosmetic details.';
+  let biggest=[...b.items].sort((a,z)=>z.price-a.price)[0];
+  let msg='Build around '+biggest.name.toLowerCase()+' as the anchor of this '+b.style.toLowerCase()+' project. ';
+  msg+=b.total<=b.budget?'The current plan leaves room in the target budget for labor, fitment surprises and finishing details.':'The current parts estimate is over target, so reduce one or two upgrade levels before buying parts.';
+  return msg;
+}
+function render(){
+  let b=currentBuild(),rows='',chips='';
+  b.items.forEach(i=>{rows+=`<div class="row"><span>${i.name} · ${i.level}</span><strong>${fmt(i.price)}</strong></div>`;chips+=`<span class="chip">${i.name}</span>`});
+  $('buildtitle').textContent=`${b.year} ${b.make} ${b.model} — ${b.style}`;
+  $('total').textContent=fmt(b.total);$('rows').innerHTML=rows||'<div class="row"><span>No upgrades selected</span><strong>$0</strong></div>';$('chips').innerHTML=chips;
+  let remaining=b.budget-b.total,pct=Math.min(100,(b.total/b.budget)*100);$('meterfill').style.width=pct+'%';
+  $('budgetstatus').className='budgetstatus '+(remaining>=0?'good':'warn');
+  $('budgetstatus').textContent=remaining>=0?`${fmt(remaining)} remaining from ${fmt(b.budget)} target budget`:`${fmt(Math.abs(remaining))} over the ${fmt(b.budget)} target budget`;
+  $('strategy').textContent=strategyFor(b);
+  let order=[...b.items].sort((a,z)=>z.price-a.price);$('order').innerHTML=order.length?order.map((i,n)=>`<li>Phase ${n+1}: ${i.name} — ${i.level} (${fmt(i.price)})</li>`).join(''):'<li>Select upgrades to create a suggested build order.</li>';
+}
+function generatePlan(){render();toast('Build plan generated')}
+function resetBuild(){
+  $('year').value='2005';$('make').value='Chevrolet';$('model').value='Tahoe';$('style').value='Street / Show';$('budget').value='10000';
+  document.querySelectorAll('.upgradeSelect').forEach(x=>x.selectedIndex=0);
+  $('wheels').selectedIndex=2;$('suspension').selectedIndex=1;$('exterior').selectedIndex=1;$('audio').selectedIndex=2;render();toast('Builder reset');
+}
+function shareBuild(){
+  let b=currentBuild();let lines=[`${b.year} ${b.make} ${b.model} — ${b.style}`,`Target budget: ${fmt(b.budget)}`,`Estimated upgrades: ${fmt(b.total)}`,'',...b.items.map(i=>`• ${i.name}: ${i.level} — ${fmt(i.price)}`),'',`Build strategy: ${strategyFor(b)}`];
+  let t=lines.join('\n');navigator.clipboard?.writeText(t).then(()=>toast('Full build plan copied!')).catch(()=>toast('Copy unavailable on this browser'));
+}
+function saveLocal(){let b=currentBuild();localStorage.setItem('buildmybeast-build',JSON.stringify(b));toast('Build saved on this device')}
 function join(){let e=$('email').value;if(!e||!e.includes('@')){toast('Enter a valid email');return}toast('Demo signup complete — connect an email service to make this live')}
-function toast(t){let x=$('toast');x.textContent=t;x.style.display='block';setTimeout(()=>x.style.display='none',2300)}build();
+function toast(t){let x=$('toast');x.textContent=t;x.style.display='block';setTimeout(()=>x.style.display='none',2300)}
+['year','make','model','style','budget'].forEach(id=>$(id)?.addEventListener('input',render));document.querySelectorAll('.upgradeSelect').forEach(x=>x.addEventListener('change',render));
+resetBuild();
 </script>
 </body>
 </html>
