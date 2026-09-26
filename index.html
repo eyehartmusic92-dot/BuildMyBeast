@@ -152,13 +152,22 @@ function smartPartResearch(b,i){
  if(i.id==='exterior')title='Trim-specific exterior upgrades';
  return [title,base+' '+i.name+' '+i.level+' aftermarket parts fitment'];
 }
+// Monetization-ready product catalog. Keep empty until a product has reliable fitment evidence
+// and an approved retailer destination. Never add passwords, API keys or affiliate-network secrets here.
+// Product record shape:
+// {id,name,category,year,make,model,engine,trim,drivetrain,sku,merchant,url,affiliate,
+//  price,priceCheckedAt,fitmentSource,fitmentCheckedAt,status:'verified'}
 const verifiedProducts=[];
+function isApprovedProduct(p){
+ return !!(p&&p.status==='verified'&&p.name&&p.category&&p.sku&&p.merchant&&p.url&&p.fitmentSource&&p.fitmentCheckedAt);
+}
 function productMatches(p,b,i){
- return p.category===i.id&&(!p.year||String(p.year)===String(b.year))&&(!p.make||p.make===b.make)&&(!p.model||p.model===b.model)&&(!p.engine||b.engine.includes(p.engine))&&(!p.trim||b.trim.includes(p.trim))&&(!p.drivetrain||b.drivetrain.includes(p.drivetrain));
+ if(!isApprovedProduct(p))return false;
+ return p.category===i.id&&(!p.year||String(p.year)===String(b.year))&&(!p.make||p.make===b.make)&&(!p.model||p.model===b.model)&&(!p.engine||(b.engine||'').includes(p.engine))&&(!p.trim||(b.trim||'').includes(p.trim))&&(!p.drivetrain||(b.drivetrain||'').includes(p.drivetrain));
 }
 function renderVerifiedProduct(p,i,b){
- let price=p.price?fmt(p.price):'See current price',merchant=p.merchant||'Verified seller';
- return '<div class="productcard verified"><div class="productimg">✓</div><div><b>'+p.name+'</b><span>'+price+' · '+merchant+'</span><div class="productmeta"><span class="badge">Verified fitment</span><span class="badge">SKU '+p.sku+'</span>'+(p.affiliate?'<span class="badge">Affiliate link</span>':'')+'</div><div class="productactions"><a href="'+p.url+'" target="_blank" rel="sponsored noopener">View product ↗</a><span>'+i.level+' build match</span></div></div></div>';
+ let price=p.price?fmt(p.price):'See current price',merchant=p.merchant||'Approved retailer',priceNote=p.priceCheckedAt?'Price checked '+p.priceCheckedAt:'Check retailer for current pricing';
+ return '<div class="productcard verified"><div class="productimg" aria-hidden="true">✓</div><div><b>'+p.name+'</b><span>'+price+' · '+merchant+'</span><div class="productmeta"><span class="badge">Verified fitment</span><span class="badge">SKU '+p.sku+'</span>'+(p.affiliate?'<span class="badge">Affiliate link</span>':'')+'</div><p class="mini" style="margin:8px 0">'+priceNote+' · Fitment reviewed '+p.fitmentCheckedAt+'. Reconfirm fitment with the retailer before ordering.</p><div class="productactions"><a href="'+p.url+'" target="_blank" rel="'+(p.affiliate?'sponsored ':'')+'noopener">View product ↗</a><span>'+i.level+' build match</span></div></div></div>';
 }
 function renderParts(b){let db=starterParts[b.profile]||{};if(!b.items.length){$('partslist').innerHTML='<div class="partitem"><span>Select one or more upgrades to create vehicle-aware product research cards.</span></div>';return}$('partslist').innerHTML=b.items.map(i=>{let matches=verifiedProducts.filter(p=>productMatches(p,b,i));if(matches.length)return matches.map(p=>renderVerifiedProduct(p,i,b)).join('');let smart=smartPartResearch(b,i),x=(b.engine||b.trim||b.drivetrain)?smart:(db[i.id]||smart),q=encodeURIComponent(x[1]),hasVehicle=!!(b.year&&b.make&&b.model&&b.make!=='Custom'&&b.model!=='Custom'),cfg=hasVehicle?[b.year,b.make,b.model,b.engine,b.trim,b.drivetrain].filter(v=>v&&v!=='Vehicle'&&v!=='Custom').join(' · '):'Select a vehicle for fitment-specific research';return '<div class="productcard"><div class="productimg" aria-hidden="true">⚙</div><div><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><b>'+x[0]+'</b><span>'+cfg+'</span></div><span class="badge pending" style="white-space:nowrap">Verify fitment</span></div><div class="productmeta"><span class="badge">'+i.level+' plan</span><span class="badge">Planned budget '+fmt(i.price)+'</span></div><p class="mini" style="margin:10px 0">Use this research card to compare parts for your selected vehicle. Confirm manufacturer fitment, dimensions, drivetrain requirements and installation details before purchase.</p><div class="productactions"><a href="https://www.google.com/search?q='+q+'" target="_blank" rel="noopener">Research compatible parts ↗</a><span class="disabled">Approved retailer options coming soon</span></div></div></div>'}).join('')}
 const vehicleDB={
