@@ -555,9 +555,32 @@ function strategyFor(b){
  msg+=b.total<=b.budget?'The current parts + labor planning estimate leaves room in the target budget for fitment surprises and finishing details.':'The current parts + labor planning estimate is over target, so reduce one or two upgrade levels before buying parts.';
  return msg;
 }
+function powertrainGuidance(b,cat){
+ let e=(b.engine||'').toLowerCase(),t=(b.trim||'').toLowerCase(),d=(b.drivetrain||'').toLowerCase(),m=(b.make+' '+b.model).toLowerCase(),notes=[];
+ if(cat==='performance'){
+  if(/ecoboost|turbo|vc-turbo|hurricane/.test(e))notes.push('Turbo-specific path: prioritize charge-air health, intake/exhaust flow, fuel quality and a calibration designed for this exact engine before increasing boost.');
+  if(/coyote/.test(e))notes.push('Coyote V8 path: intake/exhaust and engine-specific calibration are common starting points; cam, fuel and forced-induction plans require generation-specific parts.');
+  if(/hemi/.test(e)&&!/supercharged/.test(e))notes.push('HEMI path: match intake, exhaust, tuning and any cam/valvetrain work to the exact displacement and model year.');
+  if(/hellcat|supercharged hemi|supercharged v8/.test(e)||/hellcat|red.?eye|trx|raptor r|gt500|zl1/.test(t))notes.push('Factory-supercharged performance model: preserve adequate fueling, cooling and drivetrain capacity; use calibration and pulley/power changes designed for the exact factory supercharger system.');
+  if(/hybrid|powerboost|electric/.test(e))notes.push('Electrified powertrain: avoid generic engine-mod advice; prioritize chassis, tire and braking upgrades unless a modification is specifically validated for this hybrid/EV system.');
+  if(/duramax|ecodiesel|power stroke|diesel/.test(e))notes.push('Diesel path: use emissions-compliant, engine-specific upgrades and verify towing/EGT/cooling requirements before adding power.');
+  if(/type r|si/.test(t)&&m.includes('civic'))notes.push('Civic performance trim: focus on traction, cooling, brakes and engine-specific tuning rather than treating it like the base Civic.');
+  if(/2.0l turbo/.test(e)&&m.includes('accord'))notes.push('Accord 2.0T path: prioritize traction, intercooling and conservative engine-specific calibration before larger power changes.');
+ }
+ if(cat==='wheels'||cat==='suspension'){
+  if(/awd|4wd|4x4|gr-four/.test(d))notes.push('AWD/4WD fitment: keep tire rolling diameter closely matched across all four corners and verify offset/clearance with the selected suspension.');
+  if(/raptor|trx|z71|trail boss|at4|tremor|rebel/.test(t))notes.push('Off-road/performance trim: account for factory suspension, track width, brakes and wheel/tire package before changing stance or offset.');
+  if(/type r|hellcat|scat|gt500|dark horse|zl1|ss|gt\b/.test(t))notes.push('Performance trim: verify brake-caliper clearance and load/speed ratings before choosing aftermarket wheels.');
+ }
+ if(cat==='exhaust'){
+  if(/turbo|ecoboost|vc-turbo|hurricane|diesel/.test(e))notes.push('Exhaust selection must match this turbo/diesel powertrain and its emissions hardware; do not assume naturally aspirated fitment.');
+  if(/hybrid|electric/.test(e))notes.push('This powertrain needs model-specific exhaust guidance; full EV configurations have no combustion exhaust system.');
+ }
+ return notes.join(' ');
+}
 function renderRecommendations(b){
  let p=profiles[b.profile]||profiles.custom;if(!b.items.length){$('recommendations').innerHTML='<div class="rec"><span>Select upgrades to see platform-specific planning notes.</span></div>';return}
- $('recommendations').innerHTML=b.items.map(i=>'<div class="rec"><b>'+i.name+'</b><span>'+(p.recs[i.id]||'Verify exact trim, dimensions and compatibility before purchasing parts.')+'</span></div>').join('')+'<div class="rec fitnote">Fitment note: These are planning recommendations, not guaranteed part fitment. Verify VIN, trim, drivetrain, dimensions and manufacturer specifications before purchase or installation.</div>';
+ $('recommendations').innerHTML=b.items.map(i=>{let base=p.recs[i.id]||'Verify exact trim, dimensions and compatibility before purchasing parts.',smart=powertrainGuidance(b,i.id);return '<div class="rec"><b>'+i.name+'</b><span>'+base+(smart?' <strong>Configuration-aware:</strong> '+smart:'')+'</span></div>'}).join('')+'<div class="rec fitnote">Fitment note: These are planning recommendations, not guaranteed part fitment. Verify VIN, trim, drivetrain, dimensions and manufacturer specifications before purchase or installation.</div>';
 }
 function render(){
  let b=currentBuild(),rows='',chips='';b.items.forEach(i=>{rows+=`<div class="row"><span>${i.name} · ${i.level}</span><strong>${fmt(i.price)}</strong></div>`;chips+=`<span class="chip">${i.name}</span>`});
