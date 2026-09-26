@@ -253,7 +253,15 @@ const vehicleYearConfigs={
  '2006|Chevrolet|Silverado 1500':{engines:['4.3L Vortec 4300 V6','4.8L Vortec 4800 V8','5.3L Vortec 5300 V8','6.0L VortecMAX V8'],trims:['Base','LS','LT','SS','Z71 Off-Road package'],drives:['2WD / RWD','4WD']},
  '2004|GMC|Sierra 1500':{engines:['4.3L Vortec 4300 V6','4.8L Vortec 4800 V8','5.3L Vortec 5300 V8'],trims:['WT / Base','SLE','SLT'],drives:['2WD / RWD','4WD']},
  '2005|GMC|Sierra 1500':{engines:['4.3L Vortec 4300 V6','4.8L Vortec 4800 V8','5.3L Vortec 5300 V8','5.3L Vortec H.O. 5300 V8'],trims:['WT','Base','SLE','SLT'],drives:['2WD / RWD','4WD']},
- '2006|GMC|Sierra 1500':{engines:['4.3L Vortec 4300 V6','4.8L Vortec 4800 V8','5.3L Vortec 5300 V8','6.0L VortecMAX V8 (selected models)'],trims:['WT / Base','SLE','SLT','Denali (where applicable)'],drives:['2WD / RWD','4WD','AWD (Denali where applicable)']}
+ '2006|GMC|Sierra 1500':{engines:['4.3L Vortec 4300 V6','4.8L Vortec 4800 V8','5.3L Vortec 5300 V8','6.0L VortecMAX V8 (selected models)'],trims:['WT / Base','SLE','SLT','Denali (where applicable)'],drives:['2WD / RWD','4WD','AWD (Denali where applicable)']},
+ '2007|Chevrolet|Tahoe':{engines:['4.8L Vortec V8','5.3L Vortec V8'],trims:['LS','LT','LTZ','Z71 package'],drives:['2WD / RWD','4WD']},
+ '2007|GMC|Yukon':{engines:['4.8L Vortec V8 (2WD SLE)','5.3L Vortec V8','6.2L Vortec V8 (Denali)'],trims:['SLE','SLT','Denali'],drives:['2WD / RWD','4WD','AWD (Denali)']},
+ '2007|Chevrolet|Silverado 1500':{engines:['4.3L Vortec V6','4.8L Vortec V8','5.3L Vortec V8','6.0L VortecMAX V8'],trims:['WT','LS','LT','LTZ','Z71 package'],drives:['2WD / RWD','4WD']},
+ '2007|GMC|Sierra 1500':{engines:['4.3L Vortec V6 (Work Truck)','4.8L Vortec V8','5.3L Vortec V8','6.0L VortecMAX V8','6.2L Vortec V8 (Denali)'],trims:['Work Truck','SLE1','SLE2','SLT','Denali'],drives:['2WD / RWD','4WD','AWD / Denali configuration']},
+ '2008|Chevrolet|Tahoe':{engines:['4.8L Vortec V8','5.3L Vortec V8','Hybrid 6.0L V8 + electric system'],trims:['LS','LT','LTZ','Z71 package','Hybrid'],drives:['2WD / RWD','4WD']},
+ '2008|GMC|Yukon':{engines:['4.8L Vortec V8','5.3L Vortec V8','6.2L Vortec V8 (Denali)','Hybrid 6.0L V8 + electric system'],trims:['SLE','SLT','Denali','Hybrid'],drives:['2WD / RWD','4WD','AWD (Denali)']},
+ '2008|Chevrolet|Silverado 1500':{engines:['4.3L Vortec V6','4.8L Vortec V8','5.3L Vortec V8','6.0L VortecMAX V8'],trims:['WT','LS','LT','LTZ','Z71 package'],drives:['2WD / RWD','4WD']},
+ '2008|GMC|Sierra 1500':{engines:['4.3L Vortec V6','4.8L Vortec V8','5.3L Vortec V8','6.0L VortecMAX V8','6.2L Vortec V8 (Denali)'],trims:['Work Truck','SLE','SLT','Denali'],drives:['2WD / RWD','4WD','AWD / Denali configuration']}
 };
 function configForVehicle(){let exact=vehicleYearConfigs[$('vehicleYear').value+'|'+$('vehicleMake').value+'|'+$('vehicleModel').value];return exact||vehicleConfigs[$('vehicleMake').value+'|'+$('vehicleModel').value]||genericConfig()}
 function genericConfig(){return {engines:['Gasoline','Diesel','Hybrid','Electric','Other / Not sure'],trims:['Base / Standard','Sport / Performance','Luxury / Premium','Other / Not sure'],drives:['FWD','RWD','AWD','4WD','Other / Not sure']}}
