@@ -237,7 +237,10 @@ const vehicleConfigs={
  'Chevrolet|Corvette':{engines:['V8','Supercharged V8','Other / Not sure'],trims:['Base / Stingray','Grand Sport','Z06','ZR1','Other / Not sure'],drives:['RWD','Other / Not sure']}
 };
 const vehicleYearConfigs={
- '2005|Chevrolet|Tahoe':{engines:['4.8L Vortec V8','5.3L Vortec V8'],trims:['LS','Z71','LT'],drives:['2WD / RWD','4WD']}
+ '2005|Chevrolet|Tahoe':{engines:['4.8L Vortec 4800 V8','5.3L Vortec 5300 V8'],trims:['LS','Z71','LT'],drives:['2WD / RWD','4WD']},
+ '2005|GMC|Yukon':{engines:['4.8L Vortec 4800 V8','5.3L Vortec 5300 V8','6.0L Vortec 6000 V8 (Denali)'],trims:['SLE','SLT','Denali'],drives:['2WD / RWD','4WD','Full-time AWD (Denali)']},
+ '2005|Chevrolet|Silverado 1500':{engines:['4.3L Vortec 4300 V6','4.8L Vortec 4800 V8','5.3L Vortec 5300 V8','5.3L Vortec H.O. 5300 V8','6.0L Vortec H.O. 6000 V8 (SS)'],trims:['Base / Work Truck','LS','Z71','LT','SS'],drives:['2WD / RWD','4WD','AWD (SS)']},
+ '2005|GMC|Sierra 1500':{engines:['4.3L Vortec 4300 V6','4.8L Vortec 4800 V8','5.3L Vortec 5300 V8','5.3L Vortec H.O. 5300 V8'],trims:['WT','Base','SLE','SLT'],drives:['2WD / RWD','4WD']}
 };
 function configForVehicle(){let exact=vehicleYearConfigs[$('vehicleYear').value+'|'+$('vehicleMake').value+'|'+$('vehicleModel').value];return exact||vehicleConfigs[$('vehicleMake').value+'|'+$('vehicleModel').value]||genericConfig()}
 function genericConfig(){return {engines:['Gasoline','Diesel','Hybrid','Electric','Other / Not sure'],trims:['Base / Standard','Sport / Performance','Luxury / Premium','Other / Not sure'],drives:['FWD','RWD','AWD','4WD','Other / Not sure']}}
