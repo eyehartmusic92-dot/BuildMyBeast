@@ -115,7 +115,25 @@ const starterParts={
  custom:{}
 };
 function laborFor(items){return Math.round(items.reduce((sum,i)=>sum+i.price*(laborRates[i.id]||.3),0)/50)*50}
-function renderParts(b){let db=starterParts[b.profile]||{};if(!b.items.length){$('partslist').innerHTML='<div class="partitem"><span>Select upgrades to create product research cards.</span></div>';return}$('partslist').innerHTML=b.items.map(i=>{let x=db[i.id]||[i.name+' parts',b.year+' '+b.make+' '+b.model+' '+i.name],q=encodeURIComponent(x[1]);return '<div class="productcard"><div class="productimg">⚙</div><div><b>'+x[0]+'</b><span>'+i.level+' · category budget '+fmt(i.price)+'</span><div class="productmeta"><span class="badge pending">Fitment unverified</span><span class="badge">Catalog pending</span><span class="badge">Affiliate-ready</span></div><div class="productactions"><a href="https://www.google.com/search?q='+q+'" target="_blank" rel="noopener">Research category ↗</a><span class="disabled">Verified product coming soon</span></div></div></div>'}).join('')}
+function smartPartResearch(b,i){
+ let e=b.engine||'',t=b.trim||'',d=b.drivetrain||'',base=[b.year,b.make,b.model,e,t,d].filter(Boolean).join(' '),title=i.name+' parts';
+ if(i.id==='performance'){
+  if(/ecoboost|turbo|vc-turbo|hurricane/i.test(e))title='Turbo performance upgrades';
+  else if(/coyote/i.test(e))title='Coyote V8 performance upgrades';
+  else if(/hemi/i.test(e))title=/supercharged|hellcat/i.test(e+' '+t)?'Supercharged HEMI performance upgrades':'HEMI performance upgrades';
+  else if(/duramax|ecodiesel|power stroke|diesel/i.test(e))title='Diesel performance & cooling upgrades';
+  else if(/hybrid|electric/i.test(e))title='Electrified powertrain-compatible upgrades';
+ }
+ if(i.id==='wheels')title=/awd|4wd|4x4|gr-four/i.test(d)?'AWD / 4WD wheel & tire fitment':'Wheel & tire fitment';
+ if(i.id==='suspension')title=/raptor|trx|z71|trail boss|at4|tremor|rebel/i.test(t)?'Factory off-road trim suspension upgrades':'Suspension upgrades';
+ if(i.id==='exhaust')title=/turbo|ecoboost|vc-turbo|hurricane|diesel/i.test(e)?'Powertrain-specific exhaust upgrades':'Exhaust upgrades';
+ if(i.id==='audio')title='Vehicle-specific audio upgrades';
+ if(i.id==='lighting')title='Vehicle-specific lighting upgrades';
+ if(i.id==='interior')title='Trim-specific interior upgrades';
+ if(i.id==='exterior')title='Trim-specific exterior upgrades';
+ return [title,base+' '+i.name+' '+i.level+' aftermarket parts fitment'];
+}
+function renderParts(b){let db=starterParts[b.profile]||{};if(!b.items.length){$('partslist').innerHTML='<div class="partitem"><span>Select upgrades to create product research cards.</span></div>';return}$('partslist').innerHTML=b.items.map(i=>{let smart=smartPartResearch(b,i),x=(b.engine||b.trim||b.drivetrain)?smart:(db[i.id]||smart),q=encodeURIComponent(x[1]);return '<div class="productcard"><div class="productimg">⚙</div><div><b>'+x[0]+'</b><span>'+i.level+' · '+[b.engine,b.trim,b.drivetrain].filter(Boolean).join(' · ')+' · category budget '+fmt(i.price)+'</span><div class="productmeta"><span class="badge pending">Exact fitment unverified</span><span class="badge">Configuration-aware research</span><span class="badge">Affiliate-ready</span></div><div class="productactions"><a href="https://www.google.com/search?q='+q+'" target="_blank" rel="noopener">Research this configuration ↗</a><span class="disabled">Verified SKU catalog coming soon</span></div></div></div>'}).join('')}
 const vehicleDB={
 truck:[
  {make:'Chevrolet',model:'Silverado 1500',years:Array.from({length:28},(_,i)=>1999+i),profile:'silverado'},
