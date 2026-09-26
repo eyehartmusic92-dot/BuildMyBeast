@@ -133,7 +133,15 @@ function smartPartResearch(b,i){
  if(i.id==='exterior')title='Trim-specific exterior upgrades';
  return [title,base+' '+i.name+' '+i.level+' aftermarket parts fitment'];
 }
-function renderParts(b){let db=starterParts[b.profile]||{};if(!b.items.length){$('partslist').innerHTML='<div class="partitem"><span>Select upgrades to create product research cards.</span></div>';return}$('partslist').innerHTML=b.items.map(i=>{let smart=smartPartResearch(b,i),x=(b.engine||b.trim||b.drivetrain)?smart:(db[i.id]||smart),q=encodeURIComponent(x[1]);return '<div class="productcard"><div class="productimg">⚙</div><div><b>'+x[0]+'</b><span>'+i.level+' · '+[b.engine,b.trim,b.drivetrain].filter(Boolean).join(' · ')+' · category budget '+fmt(i.price)+'</span><div class="productmeta"><span class="badge pending">Exact fitment unverified</span><span class="badge">Configuration-aware research</span><span class="badge">Affiliate-ready</span></div><div class="productactions"><a href="https://www.google.com/search?q='+q+'" target="_blank" rel="noopener">Research this configuration ↗</a><span class="disabled">Verified SKU catalog coming soon</span></div></div></div>'}).join('')}
+const verifiedProducts=[];
+function productMatches(p,b,i){
+ return p.category===i.id&&(!p.year||String(p.year)===String(b.year))&&(!p.make||p.make===b.make)&&(!p.model||p.model===b.model)&&(!p.engine||b.engine.includes(p.engine))&&(!p.trim||b.trim.includes(p.trim))&&(!p.drivetrain||b.drivetrain.includes(p.drivetrain));
+}
+function renderVerifiedProduct(p,i,b){
+ let price=p.price?fmt(p.price):'See current price',merchant=p.merchant||'Verified seller';
+ return '<div class="productcard verified"><div class="productimg">✓</div><div><b>'+p.name+'</b><span>'+price+' · '+merchant+'</span><div class="productmeta"><span class="badge">Verified fitment</span><span class="badge">SKU '+p.sku+'</span>'+(p.affiliate?'<span class="badge">Affiliate link</span>':'')+'</div><div class="productactions"><a href="'+p.url+'" target="_blank" rel="sponsored noopener">View product ↗</a><span>'+i.level+' build match</span></div></div></div>';
+}
+function renderParts(b){let db=starterParts[b.profile]||{};if(!b.items.length){$('partslist').innerHTML='<div class="partitem"><span>Select upgrades to create product research cards.</span></div>';return}$('partslist').innerHTML=b.items.map(i=>{let matches=verifiedProducts.filter(p=>productMatches(p,b,i));if(matches.length)return matches.map(p=>renderVerifiedProduct(p,i,b)).join('');let smart=smartPartResearch(b,i),x=(b.engine||b.trim||b.drivetrain)?smart:(db[i.id]||smart),q=encodeURIComponent(x[1]);return '<div class="productcard"><div class="productimg">⚙</div><div><b>'+x[0]+'</b><span>'+i.level+' · '+[b.engine,b.trim,b.drivetrain].filter(Boolean).join(' · ')+' · category budget '+fmt(i.price)+'</span><div class="productmeta"><span class="badge pending">Exact fitment unverified</span><span class="badge">Configuration-aware research</span><span class="badge">Affiliate-ready</span></div><div class="productactions"><a href="https://www.google.com/search?q='+q+'" target="_blank" rel="noopener">Research this configuration ↗</a><span class="disabled">No verified SKU in catalog yet</span></div></div></div>'}).join('')}
 const vehicleDB={
 truck:[
  {make:'Chevrolet',model:'Silverado 1500',years:Array.from({length:28},(_,i)=>1999+i),profile:'silverado'},
