@@ -60,6 +60,13 @@ input,select{font-size:16px;min-height:46px}.btn,.navbtn{min-height:44px}.upgrad
 @media(max-width:720px){.howstrip{grid-template-columns:1fr;margin:0 0 42px}.howstep{padding:15px}}
 @media(max-width:380px){.costsplit{grid-template-columns:1fr}.navbtn{padding:9px 10px}.logo{font-size:14px}.hero h1{font-size:40px}}
 </style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-25NXD2D67Y"></script>
+<script>
+window.dataLayer=window.dataLayer||[];
+function gtag(){dataLayer.push(arguments)}
+gtag('js',new Date());
+gtag('config','G-25NXD2D67Y');
+</script>
 <script>window._epn = {campaign: 5339214841, smartPopover:false};</script><script>
 (function(){
  const key='bmb-funnel-v1',day=new Date().toISOString().slice(0,10);
@@ -67,6 +74,7 @@ input,select{font-size:16px;min-height:46px}.btn,.navbtn{min-height:44px}.upgrad
  window.bmbTrack=function(event,meta){
   const d=read();d[event]=(d[event]||0)+1;d.lastEvent=event;d.lastAt=new Date().toISOString();d.day=day;
   if(meta)d.lastMeta=meta;localStorage.setItem(key,JSON.stringify(d));
+  if(typeof window.gtag==='function')window.gtag('event',event,meta||{});
  };
  window.bmbFunnel=function(){const d=read();console.table(d);return d};
  const d=read();if(d.visitDay!==day){d.visitDay=day;localStorage.setItem(key,JSON.stringify(d));window.bmbTrack('visit')}
