@@ -197,20 +197,34 @@ const verifiedProducts=[];
 // eBay Smart Links monetizes ordinary eBay destinations with the BuildMyBeast Auto Parts campaign.
 // These remain research links—not verified individual-product fitment.
 const ebayCategoryTerms={
- wheels:'wheels tires',suspension:'suspension',performance:'performance parts',
- audio:'car audio',exterior:'exterior accessories',lighting:'lighting',
- interior:'interior accessories',exhaust:'exhaust'
+ wheels:'aftermarket wheels rims',suspension:'suspension upgrade',performance:'performance parts',
+ audio:'car audio',exterior:'exterior accessories',lighting:'LED lighting',
+ interior:'interior accessories',exhaust:'performance exhaust'
 };
+function ebayUpgradeTerms(i){
+ const level=(i.level||'').toLowerCase();
+ const maps={
+  wheels: level.includes('aggressive')?'aftermarket wheels rims 18 19 inch':level.includes('mild')?'aftermarket wheels rims':level.includes('full')?'performance wheels rims tires':'aftermarket wheels rims',
+  suspension: level.includes('full')?'coilovers lowering suspension kit':level.includes('mild')?'lowering springs suspension kit':'suspension upgrade',
+  performance: level.includes('full')?'performance intake tuner upgrade':level.includes('basic')?'cold air intake performance':'performance parts',
+  audio: level.includes('big bass')?'subwoofer amplifier wiring kit':level.includes('clean')?'speakers amplifier car audio':'car audio upgrade',
+  exterior: level.includes('black')?'blackout exterior accessories trim grille':level.includes('custom')?'custom body kit exterior accessories':'exterior accessories',
+  lighting: level.includes('full')?'LED headlights tail lights fog lights custom lighting':level.includes('refresh')?'LED headlights bulbs lighting':'LED lighting',
+  interior: level.includes('full')?'custom interior seats trim accessories':level.includes('refresh')?'interior trim accessories':'interior accessories',
+  exhaust: level.includes('full')?'cat back performance exhaust system':level.includes('cat-back')?'cat back exhaust':'performance exhaust'
+ };
+ return maps[i.id]||ebayCategoryTerms[i.id];
+}
 function ebayResearchLink(b,i){
  if(!b||!b.year||!b.make||!b.model||!ebayCategoryTerms[i.id]) return null;
  const details=[];
  if((i.id==='performance'||i.id==='exhaust')&&b.engine)details.push(b.engine);
  if((i.id==='suspension'||i.id==='exterior'||i.id==='interior')&&b.trim)details.push(b.trim);
- if((i.id==='wheels'||i.id==='suspension')&&b.drivetrain)details.push(b.drivetrain);
- const term=[b.year,b.make,b.model,...details,ebayCategoryTerms[i.id]].filter(Boolean).join(' ');
+ const upgradeTerms=ebayUpgradeTerms(i);
+ const term=[b.year,b.make,b.model,...details,upgradeTerms].filter(Boolean).join(' ');
  return {
   merchant:'eBay',
-  label:'Shop '+b.year+' '+b.make+' '+b.model+' '+ebayCategoryTerms[i.id]+' on eBay',
+  label:'Shop '+b.year+' '+b.make+' '+b.model+' '+upgradeTerms+' on eBay',
   url:'https://www.ebay.com/sch/i.html?_nkw='+encodeURIComponent(term),
   affiliate:true
  };
