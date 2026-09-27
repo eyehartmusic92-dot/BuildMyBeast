@@ -1,0 +1,11 @@
+{
+  "name": "buildmybeast-gallery-upload",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-09-27",
+  "workers_dev": true,
+  "vars": { "ALLOWED_ORIGIN": "https://buildmybeast.com" },
+  "ratelimits": [
+    { "name": "UPLOAD_RATE", "namespace_id": "1001", "simple": { "limit": 2, "period": 60 } },
+    { "name": "GLOBAL_RATE", "namespace_id": "1002", "simple": { "limit": 20, "period": 60 } }
+  ]
+}
