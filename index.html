@@ -215,18 +215,32 @@ function ebayUpgradeTerms(i){
  };
  return maps[i.id]||ebayCategoryTerms[i.id];
 }
+// Carefully sourced wheel specs used to improve marketplace research.
+// These specs narrow searches; they are NOT a guarantee that an individual listing fits.
+const wheelResearchSpecs={
+ '2014|Nissan|Altima':{pcd:'5x114.3',centerBore:'66.1mm',thread:'M12x1.25',oeSizes:'16 17 18 inch'}
+};
+function wheelResearchTerms(b,i){
+ if(i.id!=='wheels')return '';
+ const s=wheelResearchSpecs[[b.year,b.make,b.model].join('|')];
+ if(!s)return '';
+ let size=(i.level||'').toLowerCase().includes('aggressive')?'18 19 inch':s.oeSizes;
+ return [s.pcd,size,'center bore '+s.centerBore].join(' ');
+}
 function ebayResearchLink(b,i){
  if(!b||!b.year||!b.make||!b.model||!ebayCategoryTerms[i.id]) return null;
  const details=[];
  if((i.id==='performance'||i.id==='exhaust')&&b.engine)details.push(b.engine);
  if((i.id==='suspension'||i.id==='exterior'||i.id==='interior')&&b.trim)details.push(b.trim);
  const upgradeTerms=ebayUpgradeTerms(i);
- const term=[b.year,b.make,b.model,...details,upgradeTerms].filter(Boolean).join(' ');
+ const fitmentTerms=wheelResearchTerms(b,i);
+ const term=[b.year,b.make,b.model,...details,upgradeTerms,fitmentTerms].filter(Boolean).join(' ');
  return {
   merchant:'eBay',
   label:'Shop '+b.year+' '+b.make+' '+b.model+' '+upgradeTerms+' on eBay',
   url:'https://www.ebay.com/sch/i.html?_nkw='+encodeURIComponent(term),
-  affiliate:true
+  affiliate:true,
+  researchSpec:fitmentTerms
  };
 }
 function isApprovedProduct(p){
