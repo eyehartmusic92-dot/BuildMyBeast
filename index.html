@@ -268,7 +268,7 @@ function ebayUpgradeTerms(i){
 const wheelResearchSpecs={
  '2014|Nissan|Altima':{pcd:'5x114.3',centerBore:'66.1mm',thread:'M12x1.25',oeSizes:'16 17 18 inch'}
 };
-function ebaySearchUrl(term){return 'https://www.ebay.com/sch/i.html?_nkw='+encodeURIComponent(term)}
+function ebaySearchUrl(term){let url=new URL('https://www.ebay.com/sch/i.html');url.searchParams.set('_nkw',term);url.searchParams.set('mkcid','1');url.searchParams.set('mkrid','711-53200-19255-0');url.searchParams.set('siteid','0');url.searchParams.set('customid','link');url.searchParams.set('campid','5339214841');url.searchParams.set('toolid','20001');url.searchParams.set('mkevt','1');return url.toString()}
 function vehicleIsConfigured(){return !!($('year').value.trim()&&$('make').value.trim()&&$('model').value.trim())}
 function ebayResearchLinks(b,i){
  if(!b||!vehicleIsConfigured()||!ebayCategoryTerms[i.id]) return [];
