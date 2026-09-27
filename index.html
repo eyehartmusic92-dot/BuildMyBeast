@@ -69,15 +69,18 @@ gtag('config','G-25NXD2D67Y');
 </script>
 <script>window._epn = {campaign: 5339214841, smartPopover:false};</script><script>
 (function(){
- const key='bmb-funnel-v1',day=new Date().toISOString().slice(0,10);
+ const key='bmb-funnel-v1',day=new Date().toISOString().slice(0,10),sourceKey='bmb-acquisition-v1';
  function read(){try{return JSON.parse(localStorage.getItem(key))||{}}catch(e){return {}}}
+ function acquisition(){let saved={};try{saved=JSON.parse(localStorage.getItem(sourceKey)||'{}')}catch(e){};const q=new URLSearchParams(location.search),ref=document.referrer||'',utm={source:q.get('utm_source')||'',medium:q.get('utm_medium')||'',campaign:q.get('utm_campaign')||''};if(!saved.first_source){let source=utm.source||(/google\./i.test(ref)?'google':/facebook\.com|fb\.com/i.test(ref)?'facebook':/reddit\.com/i.test(ref)?'reddit':ref?'referral':'direct');saved={first_source:source,first_medium:utm.medium||'',first_campaign:utm.campaign||'',first_referrer:ref,last_source:source,last_medium:utm.medium||'',last_campaign:utm.campaign||'',last_referrer:ref,first_at:new Date().toISOString()};localStorage.setItem(sourceKey,JSON.stringify(saved))}else if(utm.source||ref){saved.last_source=utm.source||(/google\./i.test(ref)?'google':/facebook\.com|fb\.com/i.test(ref)?'facebook':/reddit\.com/i.test(ref)?'reddit':'referral');saved.last_medium=utm.medium||'';saved.last_campaign=utm.campaign||'';saved.last_referrer=ref;saved.last_at=new Date().toISOString();localStorage.setItem(sourceKey,JSON.stringify(saved))}return saved}
+ const acq=acquisition();
  window.bmbTrack=function(event,meta){
   const d=read();d[event]=(d[event]||0)+1;d.lastEvent=event;d.lastAt=new Date().toISOString();d.day=day;
-  if(meta)d.lastMeta=meta;localStorage.setItem(key,JSON.stringify(d));
-  if(typeof window.gtag==='function')window.gtag('event',event,meta||{});
+  const enriched=Object.assign({},meta||{},{traffic_source:acq.last_source||acq.first_source||'direct',traffic_medium:acq.last_medium||acq.first_medium||'',traffic_campaign:acq.last_campaign||acq.first_campaign||''});
+  d.lastMeta=enriched;localStorage.setItem(key,JSON.stringify(d));
+  if(typeof window.gtag==='function')window.gtag('event',event,enriched);
  };
  window.bmbFunnel=function(){const d=read();console.table(d);return d};
- const d=read();if(d.visitDay!==day){d.visitDay=day;localStorage.setItem(key,JSON.stringify(d));window.bmbTrack('visit')}
+ const d=read();if(d.visitDay!==day){d.visitDay=day;localStorage.setItem(key,JSON.stringify(d));window.bmbTrack('visit',{landing_path:location.pathname,first_source:acq.first_source||'direct'})}
  document.addEventListener('click',function(e){
   const a=e.target.closest('a');
   if(!a)return;
