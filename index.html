@@ -181,7 +181,11 @@ const ebayCategoryTerms={
 };
 function ebayResearchLink(b,i){
  if(!b||!b.year||!b.make||!b.model||!ebayCategoryTerms[i.id]) return null;
- const term=[b.year,b.make,b.model,ebayCategoryTerms[i.id]].join(' ');
+ const details=[];
+ if((i.id==='performance'||i.id==='exhaust')&&b.engine)details.push(b.engine);
+ if((i.id==='suspension'||i.id==='exterior'||i.id==='interior')&&b.trim)details.push(b.trim);
+ if((i.id==='wheels'||i.id==='suspension')&&b.drivetrain)details.push(b.drivetrain);
+ const term=[b.year,b.make,b.model,...details,ebayCategoryTerms[i.id]].filter(Boolean).join(' ');
  return {
   merchant:'eBay',
   label:'Shop '+b.year+' '+b.make+' '+b.model+' '+ebayCategoryTerms[i.id]+' on eBay',
