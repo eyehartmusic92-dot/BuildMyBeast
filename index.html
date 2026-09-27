@@ -116,6 +116,7 @@ gtag('config','G-25NXD2D67Y');
 <body>
 <nav><div class="wrap" style="width:100%;display:flex;align-items:center;justify-content:space-between"><a class="logo" href="#">BUILD<i>MY</i>BEAST</a><div class="navlinks"><a href="#builder">Builder</a><a href="#myGarage">My Garage <span id="garageNavCount"></span></a><a href="#gallery">Gallery</a><a href="guides/">Build Guides</a><a href="#about">About</a><a href="#business">Business</a></div><a class="navbtn" href="#builder">Start Building</a></div></nav>
 <main class="wrap">
+<div id="sharedBuildBanner" class="planbox" style="display:none;margin:18px 0 0;border-color:#f28b24"><div class="eyebrow">Shared Build</div><div style="display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap"><div><h3 id="sharedBuildTitle" style="margin:4px 0">Someone sent you a BuildMyBeast project.</h3><p class="mini" style="margin:0">The vehicle, build style, budget and selected upgrades have been loaded below. Review it, change anything you want, then research parts or save it to your own garage.</p></div><a class="btn" href="#builder" onclick="if(window.bmbTrack)window.bmbTrack('shared_build_continue')">Open Shared Build</a></div></div>
 <header class="hero">
 <div><div class="eyebrow">Free custom vehicle build planner</div><h1>PLAN YOUR BUILD.<br>BEFORE YOU BUY.</h1><p>Choose your exact vehicle and build style. BuildMyBeast maps out your upgrades, estimates the project budget, gives vehicle-aware guidance, and helps you research parts for the build.</p><div class="actions"><a class="btn" href="#builder">Build My Vehicle Free</a><a class="btn ghost" href="guides/">Find My Vehicle Guide</a></div><div class="heroproof"><span>No signup required to start</span><span>Vehicle-specific planning</span><span>Parts + labor estimates</span><span>AI concept visualizer</span><span>Fitment-aware research</span></div></div>
 <div class="visual" role="img" aria-label="Modified black truck in a dramatic orange-lit garage"><div class="visualtag">OFF-ROAD // STREET // RAT ROD // SHOW</div></div>
@@ -857,7 +858,7 @@ function applyGuideVehicle(){
  let style=q.get('style');if(style&&[...$('style').options].some(o=>o.value===style||o.text===style))$('style').value=style;
  let budget=q.get('budget');if(budget&&[...$('budget').options].some(o=>o.value===budget))$('budget').value=budget;
  document.querySelectorAll('.upgradeSelect').forEach(x=>{let v=q.get('u_'+x.id);if(v&&[...x.options].some(o=>o.value===v))x.value=v});
- render();if(window.bmbTrack)window.bmbTrack(q.get('year')?'shared_build_opened':'guide_to_builder',{type:type,make:make,model:model,year:q.get('year')||''});return true;
+ render();let isShared=!!q.get('year');if(isShared){let banner=$('sharedBuildBanner'),title=$('sharedBuildTitle');if(banner)banner.style.display='block';if(title)title.textContent='Shared build: '+[q.get('year'),make,model].filter(Boolean).join(' ')+' — '+($('style').value||'Custom Build')}if(window.bmbTrack)window.bmbTrack(isShared?'shared_build_opened':'guide_to_builder',{type:type,make:make,model:model,year:q.get('year')||''});return true;
 }
 const guideParams=new URLSearchParams(location.search);
 if(guideParams.get('type')&&guideParams.get('make')&&guideParams.get('model'))applyGuideVehicle();else restoreSavedBuild();
