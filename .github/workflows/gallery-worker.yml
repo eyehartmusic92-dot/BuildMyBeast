@@ -17,5 +17,5 @@ jobs:
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          accountId: 68dc5b4dcc1517d612d35b1f93278d58
           workingDirectory: gallery-worker
