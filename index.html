@@ -71,7 +71,14 @@ input,select{font-size:16px;min-height:46px}.btn,.navbtn{min-height:44px}.upgrad
   const a=e.target.closest('a');
   if(!a)return;
   if(a.getAttribute('href')==='#builder')window.bmbTrack('start_build_click');
-  if(a.textContent.includes('Shop matching options on eBay'))window.bmbTrack('ebay_outbound_click',{href:a.href});
+  if(/ebay\.com/i.test(a.href)){
+   const label=a.textContent.replace(/↗/g,'').trim();
+   const card=a.closest('.productcard');
+   const category=card&&card.querySelector('b')?card.querySelector('b').textContent.trim():'Product research';
+   window.bmbTrack('ebay_outbound_click',{label:label,category:category,href:a.href});
+   const slug=label.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,60);
+   if(slug)window.bmbTrack('ebay_click_'+slug,{category:category});
+  }
  });
 })();
 </script>
