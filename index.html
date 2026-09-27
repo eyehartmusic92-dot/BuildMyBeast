@@ -220,28 +220,32 @@ function ebayUpgradeTerms(i){
 const wheelResearchSpecs={
  '2014|Nissan|Altima':{pcd:'5x114.3',centerBore:'66.1mm',thread:'M12x1.25',oeSizes:'16 17 18 inch'}
 };
-function wheelResearchTerms(b,i){
- if(i.id!=='wheels')return '';
- const s=wheelResearchSpecs[[b.year,b.make,b.model].join('|')];
- if(!s)return '';
- let size=(i.level||'').toLowerCase().includes('aggressive')?'18 19 inch':s.oeSizes;
- return [s.pcd,size,'center bore '+s.centerBore].join(' ');
-}
-function ebayResearchLink(b,i){
- if(!b||!b.year||!b.make||!b.model||!ebayCategoryTerms[i.id]) return null;
+function ebaySearchUrl(term){return 'https://www.ebay.com/sch/i.html?_nkw='+encodeURIComponent(term)}
+function ebayResearchLinks(b,i){
+ if(!b||!b.year||!b.make||!b.model||!ebayCategoryTerms[i.id]) return [];
+ const vehicle=[b.year,b.make,b.model].join(' ');
+ if(i.id==='wheels'){
+  const s=wheelResearchSpecs[[b.year,b.make,b.model].join('|')];
+  const aggressive=(i.level||'').toLowerCase().includes('aggressive');
+  const size=aggressive?'18 19 inch':'';
+  const links=[
+   {label:'Aftermarket wheels',term:[vehicle,'aftermarket wheels rims',size].filter(Boolean).join(' ')},
+   {label:'Wheel & tire packages',term:[vehicle,'wheel tire package',size].filter(Boolean).join(' ')}
+  ];
+  if(s)links.push({label:'Search by fitment specs',term:[vehicle,'wheels',s.pcd,'center bore',s.centerBore].join(' ')});
+  return links.map(x=>({merchant:'eBay',label:x.label,url:ebaySearchUrl(x.term),affiliate:true}));
+ }
  const details=[];
  if((i.id==='performance'||i.id==='exhaust')&&b.engine)details.push(b.engine);
  if((i.id==='suspension'||i.id==='exterior'||i.id==='interior')&&b.trim)details.push(b.trim);
- const upgradeTerms=ebayUpgradeTerms(i);
- const fitmentTerms=wheelResearchTerms(b,i);
- const term=[b.year,b.make,b.model,...details,upgradeTerms,fitmentTerms].filter(Boolean).join(' ');
- return {
-  merchant:'eBay',
-  label:'Shop '+b.year+' '+b.make+' '+b.model+' '+upgradeTerms+' on eBay',
-  url:'https://www.ebay.com/sch/i.html?_nkw='+encodeURIComponent(term),
-  affiliate:true,
-  researchSpec:fitmentTerms
- };
+ const term=[vehicle,...details,ebayUpgradeTerms(i)].filter(Boolean).join(' ');
+ return [{merchant:'eBay',label:'Shop matching options',url:ebaySearchUrl(term),affiliate:true}];
+}
+function ebayResearchLink(b,i){return ebayResearchLinks(b,i)[0]||null}
+function ebayResearchButtons(b,i){
+ const links=ebayResearchLinks(b,i);
+ if(!links.length)return '<span class="disabled">Select a supported vehicle to shop retailer options</span>';
+ return links.map((x,n)=>'<a class="primary" href="'+x.url+'" target="_blank" rel="sponsored noopener">'+(i.id==='wheels'?x.label+' on eBay ↗':'Shop matching options on eBay ↗')+'</a>').join('');
 }
 function isApprovedProduct(p){
  return !!(p&&p.status==='verified'&&p.name&&p.category&&p.sku&&p.merchant&&p.url&&p.fitmentSource&&p.fitmentCheckedAt);
@@ -254,7 +258,7 @@ function renderVerifiedProduct(p,i,b){
  let price=p.price?fmt(p.price):'See current price',merchant=p.merchant||'Approved retailer',priceNote=p.priceCheckedAt?'Price checked '+p.priceCheckedAt:'Check retailer for current pricing';
  return '<div class="productcard verified"><div class="productimg" aria-hidden="true">✓</div><div><b>'+p.name+'</b><span>'+price+' · '+merchant+'</span><div class="productmeta"><span class="badge">Verified fitment</span><span class="badge">SKU '+p.sku+'</span>'+(p.affiliate?'<span class="badge">Affiliate link</span>':'')+'</div><p class="mini" style="margin:8px 0">'+priceNote+' · Fitment reviewed '+p.fitmentCheckedAt+'. Reconfirm fitment with the retailer before ordering.</p><div class="productactions"><a href="'+p.url+'" target="_blank" rel="'+(p.affiliate?'sponsored ':'')+'noopener">View product ↗</a><span>'+i.level+' build match</span></div></div></div>';
 }
-function renderParts(b){let db=starterParts[b.profile]||{};if(!b.items.length){$('partslist').innerHTML='<div class="partitem"><span>Select one or more upgrades to create vehicle-aware product research cards.</span></div>';return}$('partslist').innerHTML=b.items.map(i=>{let matches=verifiedProducts.filter(p=>productMatches(p,b,i));if(matches.length)return matches.map(p=>renderVerifiedProduct(p,i,b)).join('');let smart=smartPartResearch(b,i),x=(b.engine||b.trim||b.drivetrain)?smart:(db[i.id]||smart),q=encodeURIComponent(x[1]),hasVehicle=!!(b.year&&b.make&&b.model&&b.make!=='Custom'&&b.model!=='Custom'),cfg=hasVehicle?[b.year,b.make,b.model,b.engine,b.trim,b.drivetrain].filter(v=>v&&v!=='Vehicle'&&v!=='Custom').join(' · '):'Select a vehicle for fitment-specific research';return '<div class="productcard"><div class="productimg" aria-hidden="true">⚙</div><div><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><b>'+x[0]+'</b><span>'+cfg+'</span></div><span class="badge pending" style="white-space:nowrap">Verify fitment</span></div><div class="productmeta"><span class="badge">'+i.level+' plan</span><span class="badge">Planned budget '+fmt(i.price)+'</span></div><p class="mini" style="margin:10px 0">Use this research card to compare parts for your selected vehicle. Confirm manufacturer fitment, dimensions, drivetrain requirements and installation details before purchase.</p>'+(ebayResearchLink(b,i)?'<p class="mini" style="margin:8px 0"><b style="color:#d8dde5">Affiliate disclosure:</b> As an eBay Partner, BuildMyBeast may be compensated if you make a purchase through the eBay link below.</p>':'')+'<div class="productactions">'+(ebayResearchLink(b,i)?'<a class="primary" href="'+ebayResearchLink(b,i).url+'" target="_blank" rel="sponsored noopener">Shop matching options on eBay ↗</a>':'<span class="disabled">Select a supported vehicle to shop retailer options</span>')+'<a href="https://www.google.com/search?q='+q+'" target="_blank" rel="noopener">Compare parts elsewhere ↗</a></div>'+(ebayResearchLink(b,i)?'<p class="mini" style="margin:8px 0 0">Search is tailored to <b>'+b.year+' '+b.make+' '+b.model+'</b> and this upgrade category. Individual listings can vary—verify exact fitment before ordering.</p>':'')+'</div></div>'}).join('')}
+function renderParts(b){let db=starterParts[b.profile]||{};if(!b.items.length){$('partslist').innerHTML='<div class="partitem"><span>Select one or more upgrades to create vehicle-aware product research cards.</span></div>';return}$('partslist').innerHTML=b.items.map(i=>{let matches=verifiedProducts.filter(p=>productMatches(p,b,i));if(matches.length)return matches.map(p=>renderVerifiedProduct(p,i,b)).join('');let smart=smartPartResearch(b,i),x=(b.engine||b.trim||b.drivetrain)?smart:(db[i.id]||smart),q=encodeURIComponent(x[1]),hasVehicle=!!(b.year&&b.make&&b.model&&b.make!=='Custom'&&b.model!=='Custom'),cfg=hasVehicle?[b.year,b.make,b.model,b.engine,b.trim,b.drivetrain].filter(v=>v&&v!=='Vehicle'&&v!=='Custom').join(' · '):'Select a vehicle for fitment-specific research';return '<div class="productcard"><div class="productimg" aria-hidden="true">⚙</div><div><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><b>'+x[0]+'</b><span>'+cfg+'</span></div><span class="badge pending" style="white-space:nowrap">Verify fitment</span></div><div class="productmeta"><span class="badge">'+i.level+' plan</span><span class="badge">Planned budget '+fmt(i.price)+'</span></div><p class="mini" style="margin:10px 0">Use this research card to compare parts for your selected vehicle. Confirm manufacturer fitment, dimensions, drivetrain requirements and installation details before purchase.</p>'+(ebayResearchLink(b,i)?'<p class="mini" style="margin:8px 0"><b style="color:#d8dde5">Affiliate disclosure:</b> As an eBay Partner, BuildMyBeast may be compensated if you make a purchase through the eBay link below.</p>':'')+'<div class="productactions">'+ebayResearchButtons(b,i)+'<a href="https://www.google.com/search?q='+q+'" target="_blank" rel="noopener">Compare parts elsewhere ↗</a></div>'+(ebayResearchLink(b,i)?'<p class="mini" style="margin:8px 0 0">Search is tailored to <b>'+b.year+' '+b.make+' '+b.model+'</b> and this upgrade category. Individual listings can vary—verify exact fitment before ordering.</p>':'')+'</div></div>'}).join('')}
 const vehicleDB={
 truck:[
  {make:'Chevrolet',model:'Silverado 1500',years:Array.from({length:28},(_,i)=>1999+i),profile:'silverado'},
