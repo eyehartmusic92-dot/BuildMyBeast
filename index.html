@@ -86,9 +86,15 @@ gtag('config','G-25NXD2D67Y');
    const label=a.textContent.replace(/↗/g,'').trim();
    const card=a.closest('.productcard');
    const category=card&&card.querySelector('b')?card.querySelector('b').textContent.trim():'Product research';
-   window.bmbTrack('ebay_outbound_click',{label:label,category:category,href:a.href});
+   const year=(document.getElementById('year')||{}).value||'';
+   const make=(document.getElementById('make')||{}).value||'';
+   const model=(document.getElementById('model')||{}).value||'';
+   const style=(document.getElementById('style')||{}).value||'';
+   const vehicle=[year,make,model].filter(Boolean).join(' ');
+   const meta={label:label,category:category,vehicle:vehicle,year:year,make:make,model:model,build_style:style,link_url:a.href};
+   window.bmbTrack('ebay_outbound_click',meta);
    const slug=label.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,60);
-   if(slug)window.bmbTrack('ebay_click_'+slug,{category:category});
+   if(slug)window.bmbTrack('ebay_click_'+slug,{category:category,vehicle:vehicle,build_style:style});
   }
  });
 })();
