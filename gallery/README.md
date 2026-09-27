@@ -1,13 +1,16 @@
 # BuildMyBeast gallery operation
 
-The live site works without an image service. Sample ideas remain visible, and the submission form stays hidden until the configuration in `config.js` is populated. No credential or API secret belongs in the public repository.
+The live site works without external image storage. Sample ideas remain visible, and submissions stay hidden until the protected upload Worker, human check, and moderation are connected. No API secret belongs in this public repository or `config.js`.
 
 ## Activation gate
 
-1. Create an image-host account on the free plan without adding a payment method. Check the current plan limits and account usage before enabling public uploads.
-2. Create an **unsigned image upload preset** that restricts formats to JPG, PNG, and WebP, assigns incoming uploads to a dedicated pending folder, disables caller-chosen public IDs, and applies **manual moderation**. Verify the preset's behavior with a test upload and confirm the image cannot be served before approval.
-3. Anonymous upload presets are visible to visitors and do not have a server-enforced per-preset file-size limit. The page checks 3 MB in the browser, but a direct API caller can bypass it. Add an independently enforced request/rate limit or keep public uploads disabled if abuse and free-credit exhaustion are unacceptable. Do not activate solely on the strength of the browser check.
-4. After the protections are working, enter the public cloud name and unsigned preset name in `config.js`. Test a submission from an unsigned-out browser, review it in the image host's moderation queue, and confirm rejection does not reach the gallery.
+1. Use free plans without adding a payment method. Check the current allowances and service policies before enabling public uploads. Cloudinary provides image storage; Cloudflare Workers and Turnstile protect the intake.
+2. In Cloudinary, create a **signed image upload preset** with JPG/PNG/WebP only, a dedicated pending folder, random public IDs, and **manual moderation**. Test that pending images cannot be delivered publicly, and that rejected images stay out of the gallery.
+3. Create a Cloudflare Turnstile widget restricted to `buildmybeast.com` (and `www.buildmybeast.com` if used). The Worker validates its token on the server. Deploy the Worker in `gallery-worker/` on the Workers Free plan with its rate-limit bindings. Set `CLOUD_NAME`, `CLOUD_API_KEY`, `CLOUD_API_SECRET`, `CLOUD_SIGNED_PRESET`, and `TURNSTILE_SECRET` as Worker secrets; `ALLOWED_ORIGIN` is already in `wrangler.jsonc`. Never put these secrets in site code or version control.
+4. Test a valid photo, an oversized file, an invalid image, an invalid or missing Turnstile token, an unapproved origin, and repeated requests. Verify the moderation queue before public activation. The rate-limit binding is per Cloudflare location and eventually consistent, so it is abuse mitigation rather than an exact global usage cap. Monitor image-host usage and keep the free account without a payment method.
+5. Only then set the public `cloudName`, Worker `uploadEndpoint` (ending in `/upload`), and Turnstile `turnstileSiteKey` in `config.js`. Test from a signed-out browser. The form appears only when all three values are present and Turnstile loads.
+
+Run the upload gate smoke test with `node gallery-worker/worker.test.mjs`. The Worker is a separate deployment; the GitHub Pages workflow does not deploy it.
 
 ## Publishing an approved build
 
@@ -24,4 +27,4 @@ Approval alone does not publish a build. Review the photo and its contextual tit
 }
 ```
 
-Categories: `offroad`, `street`, `audio`, `custom`. The gallery accepts HTTPS Cloudinary image URLs and same-origin `/gallery/` images. Publication happens with the next GitHub Pages deployment. Keep the list small and prune old entries as needed; it displays up to 100 approved records. Never commit pending or rejected uploads.
+Categories: `offroad`, `street`, `audio`, `custom`. The gallery accepts HTTPS Cloudinary image URLs and same-origin `/gallery/` images. Publication happens with the next GitHub Pages deployment. It displays up to 100 approved records. Never commit pending or rejected uploads.
