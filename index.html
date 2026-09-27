@@ -57,7 +57,25 @@ input,select{font-size:16px;min-height:46px}.btn,.navbtn{min-height:44px}.upgrad
 @media(max-width:720px){.howstrip{grid-template-columns:1fr;margin:0 0 42px}.howstep{padding:15px}}
 @media(max-width:380px){.costsplit{grid-template-columns:1fr}.navbtn{padding:9px 10px}.logo{font-size:14px}.hero h1{font-size:40px}}
 </style>
-<script>window._epn = {campaign: 5339214841, smartPopover:false};</script>
+<script>window._epn = {campaign: 5339214841, smartPopover:false};</script><script>
+(function(){
+ const key='bmb-funnel-v1',day=new Date().toISOString().slice(0,10);
+ function read(){try{return JSON.parse(localStorage.getItem(key))||{}}catch(e){return {}}}
+ window.bmbTrack=function(event,meta){
+  const d=read();d[event]=(d[event]||0)+1;d.lastEvent=event;d.lastAt=new Date().toISOString();d.day=day;
+  if(meta)d.lastMeta=meta;localStorage.setItem(key,JSON.stringify(d));
+ };
+ window.bmbFunnel=function(){const d=read();console.table(d);return d};
+ const d=read();if(d.visitDay!==day){d.visitDay=day;localStorage.setItem(key,JSON.stringify(d));window.bmbTrack('visit')}
+ document.addEventListener('click',function(e){
+  const a=e.target.closest('a');
+  if(!a)return;
+  if(a.getAttribute('href')==='#builder')window.bmbTrack('start_build_click');
+  if(a.textContent.includes('Shop matching options on eBay'))window.bmbTrack('ebay_outbound_click',{href:a.href});
+ });
+})();
+</script>
+
 <script src="https://epnt.ebay.com/static/epn-smart-tools.js"></script>
 </head>
 <body>
@@ -681,7 +699,7 @@ function render(){
  let remaining=b.budget-b.total,pct=Math.min(100,(b.total/b.budget)*100);$('meterfill').style.width=pct+'%';$('budgetstatus').className='budgetstatus '+(remaining>=0?'good':'warn');$('budgetstatus').textContent=remaining>=0?`${fmt(remaining)} remaining from ${fmt(b.budget)} target budget`:`${fmt(Math.abs(remaining))} over the ${fmt(b.budget)} target budget`;
  $('strategy').textContent=strategyFor(b);let order=[...b.items].sort((a,z)=>z.price-a.price);$('order').innerHTML=order.length?order.map((i,n)=>`<li>Phase ${n+1}: ${i.name} — ${i.level} (${fmt(i.price)})</li>`).join(''):'<li>Select upgrades to create a suggested build order.</li>';renderRecommendations(b);renderParts(b);
 }
-function generatePlan(){render();toast('Vehicle-aware build plan generated')}
+function generatePlan(){render();if(window.bmbTrack)window.bmbTrack('build_plan_generated');toast('Vehicle-aware build plan generated')}
 let vehiclePhotoURL='';
 function handleVehiclePhoto(e){let file=e.target.files&&e.target.files[0];if(!file)return;if(!/^image\/(jpeg|png|webp)$/.test(file.type)){toast('Please choose a JPG, PNG or WebP image');e.target.value='';return}if(file.size>12*1024*1024){toast('Please choose an image under 12 MB');e.target.value='';return}if(vehiclePhotoURL)URL.revokeObjectURL(vehiclePhotoURL);vehiclePhotoURL=URL.createObjectURL(file);$('originalPreview').src=vehiclePhotoURL;$('originalPreview').style.display='block';$('originalPlaceholder').style.display='none';$('visualizeBtn').disabled=false;$('conceptPreview').textContent='Photo ready. Click Visualize My Build to create the transformation brief.';toast('Vehicle photo ready')}
 function buildVisualPrompt(){let b=currentBuild(),details={
