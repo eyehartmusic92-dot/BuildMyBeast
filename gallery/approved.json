@@ -5,6 +5,7 @@
     "category": "street",
     "mods": "Wheels, Grille, Headlights, Window Tint and an Led Refresh",
     "description": "A dark street-style Altima with updated wheels, grille, headlights, window tint, and an LED refresh.",
-    "imageUrl": "https://res.cloudinary.com/yfpthneq/image/upload/fgwv9fx7osu7pxpq9lpo.png"
+    "imageUrl": "https://res.cloudinary.com/yfpthneq/image/upload/fgwv9fx7osu7pxpq9lpo.png",
+    "slug": "shade"
   }
 ]
