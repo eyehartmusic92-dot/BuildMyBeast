@@ -876,8 +876,8 @@ function applyGuideVehicle(){
  [['vehicleEngine',q.get('engine')],['vehicleTrim',q.get('trim')],['vehicleDrive',q.get('drive')]].forEach(([id,v])=>{if(v&&[...$(id).options].some(o=>o.value===v||o.text===v))$(id).value=v});
  let style=q.get('style');if(style&&[...$('style').options].some(o=>o.value===style||o.text===style))$('style').value=style;
  let budget=q.get('budget');if(budget&&[...$('budget').options].some(o=>o.value===budget))$('budget').value=budget;
- document.querySelectorAll('.upgradeSelect').forEach(x=>{let v=q.get('u_'+x.id);if(v&&[...x.options].some(o=>o.value===v))x.value=v});
- render();let isShared=!!q.get('year');if(isShared){let banner=$('sharedBuildBanner'),title=$('sharedBuildTitle');if(banner)banner.style.display='block';if(title)title.textContent='Shared build: '+[q.get('year'),make,model].filter(Boolean).join(' ')+' — '+($('style').value||'Custom Build')}if(window.bmbTrack)window.bmbTrack(isShared?'shared_build_opened':'guide_to_builder',{type:type,make:make,model:model,year:q.get('year')||''});return true;
+ const hasGuideUpgrades=[...q.keys()].some(k=>k.startsWith('u_'));document.querySelectorAll('.upgradeSelect').forEach(x=>{let v=q.get('u_'+x.id);if(hasGuideUpgrades)x.value='0';if(v&&[...x.options].some(o=>o.value===v))x.value=v});
+ render();let isShared=!!q.get('year')&&q.get('utm_source')!=='build_guides';if(isShared){let banner=$('sharedBuildBanner'),title=$('sharedBuildTitle');if(banner)banner.style.display='block';if(title)title.textContent='Shared build: '+[q.get('year'),make,model].filter(Boolean).join(' ')+' — '+($('style').value||'Custom Build')}if(window.bmbTrack)window.bmbTrack(isShared?'shared_build_opened':'guide_to_builder',{type:type,make:make,model:model,year:q.get('year')||''});return true;
 }
 const guideParams=new URLSearchParams(location.search);
 if(guideParams.get('type')&&guideParams.get('make')&&guideParams.get('model'))applyGuideVehicle();else restoreSavedBuild();
