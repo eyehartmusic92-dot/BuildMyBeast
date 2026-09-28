@@ -16,12 +16,14 @@ Visitor uploads are live at [buildmybeast.com/#gallery](https://buildmybeast.com
      "category": "offroad",
      "mods": "Lift, tires, lighting",
      "description": "A short, factual build description.",
-     "imageUrl": "https://res.cloudinary.com/yfpthneq/image/upload/PUBLIC_ID.jpg"
+     "imageUrl": "https://res.cloudinary.com/yfpthneq/image/upload/PUBLIC_ID.jpg",
+   "planner": { "type": "suv", "make": "Chevrolet", "model": "Tahoe", "year": "2005", "style": "Street / Show", "budget": "10000", "upgrades": { "wheels": "2800" } }
    }
    ```
    
    Use the asset's actual image extension and Public ID. Give each approved build a unique lowercase slug with letters, numbers, and hyphens (up to 60 characters). Its direct link is `https://buildmybeast.com/?build=SLUG#gallery`; the card offers a Copy Build Link button. Categories are `offroad`, `street`, `audio`, and `custom`. The gallery accepts HTTPS Cloudinary image URLs and same-origin `/gallery/` images, and displays up to 100 approved records.
-4. After GitHub Pages publishes the change, verify the card and photo at `https://buildmybeast.com/#gallery` in a private browser window. The other cards are sample concepts, labeled separately from member photos.
+4. If the member build should have a share page with its own photo preview, create `builds/SLUG.html` with a canonical URL and Open Graph title, description, URL and image. Add that URL to `sitemap.xml` and make the gallery share link point to it. Otherwise the gallery's `?build=SLUG#gallery` link remains the direct link. The optional `planner` values must match real builder options; they are inspiration presets, not the vehicle's actual parts or prices.
+5. After GitHub Pages publishes the change, verify the card and photo at `https://buildmybeast.com/#gallery` in a private browser window. The other cards are sample concepts, labeled separately from member photos.
 
 The first published member build is **Shade**, a 2014 Nissan Altima. Do not put pending, rejected, or unreviewed records in `approved.json`.
 
