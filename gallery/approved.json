@@ -6,7 +6,21 @@
     "mods": "26 Inch Wheels, Window Tint, Smoked Rain Guards, Major Bass System, New Headlights, New Taillights, LEDs all the way throughout",
     "description": "A street/show 2005 Chevrolet Tahoe with 26-inch wheels, tinted windows, smoked rain guards, a major bass system, refreshed headlights and taillights, and LED accents throughout.",
     "imageUrl": "https://res.cloudinary.com/yfpthneq/image/upload/fjtal2d6u1h91pvv9r8x.jpg",
-    "slug": "my-hoe"
+    "slug": "my-hoe",
+    "planner": {
+      "type": "suv",
+      "make": "Chevrolet",
+      "model": "Tahoe",
+      "year": "2005",
+      "style": "Street / Show",
+      "budget": "10000",
+      "upgrades": {
+        "wheels": "2800",
+        "audio": "1800",
+        "exterior": "700",
+        "lighting": "350"
+      }
+    }
   },
   {
     "title": "Shade",
@@ -15,6 +29,19 @@
     "mods": "Wheels, Grille, Headlights, Window Tint and an Led Refresh",
     "description": "A dark street-style Altima with updated wheels, grille, headlights, window tint, and an LED refresh.",
     "imageUrl": "https://res.cloudinary.com/yfpthneq/image/upload/fgwv9fx7osu7pxpq9lpo.png",
-    "slug": "shade"
+    "slug": "shade",
+    "planner": {
+      "type": "car",
+      "make": "Nissan",
+      "model": "Altima",
+      "year": "2014",
+      "style": "Street / Show",
+      "budget": "5000",
+      "upgrades": {
+        "wheels": "1500",
+        "exterior": "700",
+        "lighting": "350"
+      }
+    }
   }
 ]
