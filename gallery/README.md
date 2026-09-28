@@ -10,6 +10,7 @@ Visitor uploads are live at [buildmybeast.com/#gallery](https://buildmybeast.com
    
    ```json
    {
+     "slug": "trail-ready-tahoe",
      "title": "Trail-ready Tahoe",
      "vehicle": "2005 Chevrolet Tahoe",
      "category": "offroad",
@@ -19,7 +20,7 @@ Visitor uploads are live at [buildmybeast.com/#gallery](https://buildmybeast.com
    }
    ```
    
-   Use the asset's actual image extension and Public ID. Categories are `offroad`, `street`, `audio`, and `custom`. The gallery accepts HTTPS Cloudinary image URLs and same-origin `/gallery/` images, and displays up to 100 approved records.
+   Use the asset's actual image extension and Public ID. Give each approved build a unique lowercase slug with letters, numbers, and hyphens (up to 60 characters). Its direct link is `https://buildmybeast.com/?build=SLUG#gallery`; the card offers a Copy Build Link button. Categories are `offroad`, `street`, `audio`, and `custom`. The gallery accepts HTTPS Cloudinary image URLs and same-origin `/gallery/` images, and displays up to 100 approved records.
 4. After GitHub Pages publishes the change, verify the card and photo at `https://buildmybeast.com/#gallery` in a private browser window. The other cards are sample concepts, labeled separately from member photos.
 
 The first published member build is **Shade**, a 2014 Nissan Altima. Do not put pending, rejected, or unreviewed records in `approved.json`.
