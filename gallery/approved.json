@@ -1,5 +1,14 @@
 [
   {
+    "title": "My Hoe",
+    "vehicle": "2005 Chevrolet Tahoe",
+    "category": "street",
+    "mods": "26 Inch Wheels, Window Tint, Smoked Rain Guards, Major Bass System, New Headlights, New Taillights, LEDs all the way throughout",
+    "description": "A street/show 2005 Chevrolet Tahoe with 26-inch wheels, tinted windows, smoked rain guards, a major bass system, refreshed headlights and taillights, and LED accents throughout.",
+    "imageUrl": "https://res.cloudinary.com/yfpthneq/image/upload/fjtal2d6u1h91pvv9r8x.jpg",
+    "slug": "my-hoe"
+  },
+  {
     "title": "Shade",
     "vehicle": "2014 Nissan Altima",
     "category": "street",
