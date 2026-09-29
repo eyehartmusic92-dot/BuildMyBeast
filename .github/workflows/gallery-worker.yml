@@ -1,6 +1,9 @@
 name: Deploy gallery upload gate
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['gallery-worker/**', '.github/workflows/gallery-worker.yml']
 
 permissions:
   contents: read
@@ -11,6 +14,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Check upload gate
         run: node --test gallery-worker/worker.test.mjs
       - name: Deploy gallery Worker
