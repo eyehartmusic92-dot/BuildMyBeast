@@ -43,5 +43,14 @@
         "lighting": "350"
       }
     }
+  },
+  {
+    "title": "BDK",
+    "vehicle": "2007 Chevrolet Tahoe",
+    "category": "street",
+    "mods": "26 Inch Wheels, Window Tint, New Headlights and Taillights, Texas Edition Trim, Three Memphis Subs in a Custom Ported Box",
+    "description": "A street/show 2007 Chevrolet Tahoe with 26-inch wheels, window tint, new headlights and taillights, Texas Edition trim, and three Memphis subwoofers in a custom ported box.",
+    "imageUrl": "https://res.cloudinary.com/yfpthneq/image/upload/xiim7opvwosjuwkkuugj",
+    "slug": "bdk"
   }
 ]
