@@ -34,11 +34,42 @@ async function sha1(text) {
   const bytes = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(text));
   return [...new Uint8Array(bytes)].map(x => x.toString(16).padStart(2, '0')).join('');
 }
+
+async function approvedFeed(request, env) {
+  if (!env.CLOUD_NAME || !env.CLOUD_API_KEY || !env.CLOUD_API_SECRET) return reply('Gallery unavailable', 503, env.ALLOWED_ORIGIN);
+  const cache = globalThis.caches?.default;
+  const cacheKey = new Request(new URL('/approved', request.url).href);
+  const cached = cache && await cache.match(cacheKey);
+  if (cached) return cached;
+  try {
+    const url = new URL('https://api.cloudinary.com/v1_1/' + encodeURIComponent(env.CLOUD_NAME) + '/resources/image/moderations/manual/approved');
+    url.searchParams.set('context', 'true');
+    url.searchParams.set('max_results', '100');
+    const result = await fetch(url.href, { headers: { Authorization: 'Basic ' + btoa(env.CLOUD_API_KEY + ':' + env.CLOUD_API_SECRET) } });
+    if (!result.ok) throw Error('cloudinary');
+    const data = await result.json();
+    if (!Array.isArray(data.resources)) throw Error('format');
+    const rows = data.resources.flatMap(asset => {
+      const c = asset.context?.custom || {};
+      if (asset.moderation_status !== 'approved' || asset.moderation_kind !== 'manual' || asset.resource_type !== 'image' || asset.type !== 'upload') return [];
+      const title = clean(c.title, 60), vehicle = clean(c.vehicle, 90), mods = clean(c.mods, 400), category = clean(c.category, 20);
+      if (!title || !vehicle || !mods || !CATEGORIES.has(category)) return [];
+      const image = new URL(asset.secure_url);
+      if (image.protocol !== 'https:' || image.hostname !== 'res.cloudinary.com' || !image.pathname.startsWith('/' + env.CLOUD_NAME + '/image/upload/')) return [];
+      return [{ title, vehicle, mods, category, imageUrl: image.href, publicId: asset.public_id, slug: 'member-' + String(asset.asset_id || '').replace(/[^a-z0-9]/gi, '').slice(0, 40).toLowerCase() }];
+    });
+    const response = new Response(JSON.stringify(rows), { headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': env.ALLOWED_ORIGIN, 'Cache-Control': 'public, max-age=900' } });
+    if (cache) await cache.put(cacheKey, response.clone());
+    return response;
+  } catch (e) { return reply('Gallery temporarily unavailable', 503, env.ALLOWED_ORIGIN); }
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin') || '';
     if (origin !== env.ALLOWED_ORIGIN) return new Response('Forbidden', { status: 403 });
-    if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Max-Age': '600', 'Vary': 'Origin' } });
+    if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Max-Age': '600', 'Vary': 'Origin' } });
+    if (request.method === 'GET' && new URL(request.url).pathname === '/approved') return approvedFeed(request, env);
     if (request.method !== 'POST' || new URL(request.url).pathname !== '/upload') return reply('Not found', 404, origin);
     if (!env.CLOUD_NAME || !env.CLOUD_API_KEY || !env.CLOUD_API_SECRET || !env.CLOUD_SIGNED_PRESET || !env.TURNSTILE_SECRET || !env.UPLOAD_RATE || !env.GLOBAL_RATE) return reply('Uploads unavailable', 503, origin);
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
