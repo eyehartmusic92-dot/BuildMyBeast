@@ -12,6 +12,7 @@
   document.getElementById('memberMods').textContent=String(row.mods||'').slice(0,600);
   document.getElementById('memberPhoto').src=image.href.replace('/image/upload/','/image/upload/f_auto,q_auto,w_1400/');
   document.getElementById('memberPhoto').alt=row.title+' — '+row.vehicle;
+  const photos=document.getElementById('memberPhotos');for(const value of (Array.isArray(row.photos)?row.photos:[]).slice(0,2)){let extra;try{extra=new URL(value)}catch(e){continue}if(extra.protocol!=='https:'||extra.hostname!=='res.cloudinary.com'||!extra.pathname.startsWith('/yfpthneq/image/upload/'))continue;const img=document.createElement('img');img.className='photo';img.loading='lazy';img.src=extra.href.replace('/image/upload/','/image/upload/f_auto,q_auto,w_1400/');img.alt=row.title+' — additional approved view';photos.append(img)}
   document.getElementById('memberPlanner').href='/?build='+encodeURIComponent(slug)+'#gallery';
   document.title=row.title+' · '+row.vehicle+' | BuildMyBeast';
   document.querySelector('link[rel="canonical"]').href=location.origin+location.pathname+'?build='+encodeURIComponent(slug);
