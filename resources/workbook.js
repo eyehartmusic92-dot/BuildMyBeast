@@ -1,0 +1,10 @@
+(function(){
+ const key='bmb-project-workbook-v1',form=document.getElementById('workbook'),status=document.getElementById('workbookStatus');
+ let saved={};try{saved=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}
+ for(const input of form.querySelectorAll('[name]'))if(typeof saved[input.name]==='string')input.value=saved[input.name];
+ const snapshot=()=>Object.fromEntries([...form.querySelectorAll('[name]')].map(input=>[input.name,input.value]));
+ form.addEventListener('input',()=>{try{localStorage.setItem(key,JSON.stringify(snapshot()));status.textContent='Saved in this browser.'}catch(e){status.textContent='Browser storage is unavailable. Print or download a backup to keep your work.'}});
+ document.getElementById('printWorkbook').addEventListener('click',()=>window.print());
+ document.getElementById('downloadWorkbook').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([JSON.stringify({format:'buildmybeast-workbook',version:1,fields:snapshot()},null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='buildmybeast-project-workbook.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);if(typeof gtag==='function')gtag('event','workbook_downloaded')});
+ document.getElementById('importWorkbook').addEventListener('change',async event=>{const file=event.target.files[0];event.target.value='';if(!file)return;try{if(file.size>200000)throw Error('size');const data=JSON.parse(await file.text());if(data.format!=='buildmybeast-workbook'||data.version!==1||!data.fields||typeof data.fields!=='object')throw Error('format');for(const input of form.querySelectorAll('[name]'))if(data.fields[input.name]!==undefined&&(typeof data.fields[input.name]!=='string'||data.fields[input.name].length>10000))throw Error('field');if(!confirm('Replace the workbook fields on this device with this backup?'))return;for(const input of form.querySelectorAll('[name]'))input.value=data.fields[input.name]||'';form.dispatchEvent(new Event('input'));}catch(e){status.textContent='Could not import this workbook backup.'}});
+})();

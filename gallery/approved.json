@@ -51,6 +51,21 @@
     "mods": "26 Inch Wheels, Window Tint, New Headlights and Taillights, Texas Edition Trim, Three Memphis Subs in a Custom Ported Box",
     "description": "A street/show 2007 Chevrolet Tahoe with 26-inch wheels, window tint, new headlights and taillights, Texas Edition trim, and three Memphis subwoofers in a custom ported box.",
     "imageUrl": "https://res.cloudinary.com/yfpthneq/image/upload/xiim7opvwosjuwkkuugj",
-    "slug": "bdk"
+    "slug": "bdk",
+    "planner": {
+      "type": "suv",
+      "make": "Chevrolet",
+      "model": "Tahoe",
+      "year": "2007",
+      "style": "Street / Show",
+      "budget": "10000",
+      "upgrades": {
+        "wheels": "2800",
+        "audio": "3500",
+        "exterior": "700",
+        "lighting": "350"
+      }
+    }
   }
 ]
+

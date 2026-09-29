@@ -1,0 +1,15 @@
+const fs=require('fs'),path=require('path'),vm=require('vm'),assert=require('assert');
+const root=path.resolve(__dirname,'..'),html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const lines=name=>html.match(new RegExp('function '+name+'[^\\n]+'))[0];
+let saved=JSON.stringify([{id:'a',nickname:'Daily Tahoe',build:{year:2007,make:'Chevrolet',model:'Tahoe'}},{id:'b',build:{make:'Nissan',model:'Altima'}}]),accept=false,nodes={};
+const ctx={localStorage:{getItem:()=>saved,setItem:(k,v)=>saved=v},$:id=>nodes[id]||(nodes[id]={style:{}}),confirm:()=>accept,toast(){},renderGarage(){},window:{},editingGarageId:null,endGarageEdit(){}};
+vm.createContext(ctx);vm.runInContext('let lastGarageRemoval=null;'+lines('removeGarageBuild')+lines('undoGarageRemoval'),ctx);
+ctx.removeGarageBuild('a');assert.equal(JSON.parse(saved).length,2);
+accept=true;ctx.removeGarageBuild('a');assert.equal(JSON.parse(saved).length,1);ctx.undoGarageRemoval();assert.equal(JSON.parse(saved)[0].nickname,'Daily Tahoe');assert.equal(JSON.parse(saved).length,2);
+const compareNodes={compareBuildA:{value:'a'},compareBuildB:{value:'b'},garageComparison:{}};
+let b={year:2007,make:'Chevrolet',model:'Tahoe',budget:15000,parts:6500,labor:1750,total:8250,items:[],upgrades:{}};
+const compare={localStorage:{getItem:()=>JSON.stringify([{id:'a',nickname:'<Daily>',build:b},{id:'b',nickname:'Show',build:{...b,budget:20000,total:9000}}])},$:id=>compareNodes[id],categoryNames:{wheels:'Wheels'},escapeHtml:v=>String(v).replaceAll('<','&lt;').replaceAll('>','&gt;'),fmt:v=>'$'+v};
+vm.createContext(compare);vm.runInContext(lines('renderBuildComparison'),compare);compare.renderBuildComparison();assert(compareNodes.garageComparison.innerHTML.includes('comparison-changed'));assert(compareNodes.garageComparison.innerHTML.includes('$750 higher'));assert(compareNodes.garageComparison.innerHTML.includes('&lt;Daily&gt;'));assert(compareNodes.garageComparison.innerHTML.includes('Budget remaining'));
+const infer={vehicleDB:{suv:[{make:'Chevrolet',model:'Tahoe',years:[2007]}]}};vm.createContext(infer);vm.runInContext(lines('inferGalleryPlanner'),infer);const preset=infer.inferGalleryPlanner('2007 Chevrolet Tahoe','street','26 Inch Wheels, Three Memphis Subs, LEDs');assert.equal(preset.upgrades.wheels,'1500');assert.equal(preset.upgrades.audio,'1800');assert.equal(preset.upgrades.lighting,'350');assert.equal(infer.inferGalleryPlanner('1900 Chevrolet Tahoe','street',''),null);assert.equal(infer.inferGalleryPlanner('Unknown vehicle','street',''),null);
+for(const slug of ['bdk','shade','my-hoe']){const page=fs.readFileSync(path.join(root,'builds',slug+'.html'),'utf8');assert(page.includes('Plan a Similar Build'));assert(page.includes('rel="canonical"'));assert(page.includes('og:image'));assert(page.includes('utm_source=beast_gallery'));assert(page.includes('data-share'));}
+console.log('PASS: removal cancel/undo, comparison differences/escaping/budgets, inferred presets/year validation, build-page metadata and planner links');
