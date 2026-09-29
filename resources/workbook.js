@@ -1,7 +1,27 @@
 (function(){
  const key='bmb-project-workbook-v1',form=document.getElementById('workbook'),status=document.getElementById('workbookStatus');
  let saved={};try{saved=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}
+ if(!saved||typeof saved!=='object'||Array.isArray(saved))saved={};
  for(const input of form.querySelectorAll('[name]'))if(typeof saved[input.name]==='string')input.value=saved[input.name];
+
+ function costTotals(budget,rows){
+  const cents=value=>{if(value==='')return 0;const n=Number(value);if(!Number.isFinite(n)||n<0||n>1000000)throw Error('amount');return Math.round(n*100)};
+  const planned=rows.reduce((total,row)=>total+cents(row.planned),0),actual=rows.reduce((total,row)=>total+cents(row.actual),0);
+  return {planned,actual,remaining:budget===''?null:cents(budget)-actual,plannedRemaining:budget===''?null:cents(budget)-planned};
+ }
+ function renderCosts(){
+  const output=id=>document.getElementById(id),field=name=>form.querySelector('[name="'+name+'"]').value;
+  const money=cents=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(cents/100);
+  try{
+   const totals=costTotals(field('costBudget'),Array.from({length:8},(_,i)=>({planned:field('expense'+(i+1)+'Planned'),actual:field('expense'+(i+1)+'Actual')})));
+   output('costPlanned').textContent=money(totals.planned);output('costActual').textContent=money(totals.actual);
+   output('costRemaining').textContent=totals.remaining===null?'Enter a budget':money(totals.remaining);
+   output('costRemaining').style.color=totals.remaining!==null&&totals.remaining<0?'#ffad91':'';
+   output('costSummary').textContent=totals.remaining===null?'Enter a project budget to compare your spending.':totals.remaining<0?'Actual spending is '+money(-totals.remaining)+' over budget.':totals.plannedRemaining<0?'Your planned expenses exceed the budget by '+money(-totals.plannedRemaining)+'.':'Actual spending is within your project budget.';
+  }catch(e){for(const id of ['costPlanned','costActual','costRemaining'])output(id).textContent='Check amounts';output('costSummary').textContent='Use amounts from 0 to 1,000,000 for each field.'}
+ }
+ form.addEventListener('input',renderCosts);renderCosts();
+
  const snapshot=()=>Object.fromEntries([...form.querySelectorAll('[name]')].map(input=>[input.name,input.value]));
  form.addEventListener('input',()=>{try{localStorage.setItem(key,JSON.stringify(snapshot()));status.textContent='Saved in this browser.'}catch(e){status.textContent='Browser storage is unavailable. Print or download a backup to keep your work.'}});
  document.getElementById('printWorkbook').addEventListener('click',()=>window.print());
