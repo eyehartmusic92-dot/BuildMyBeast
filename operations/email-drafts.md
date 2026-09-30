@@ -8,13 +8,15 @@ Audience: confirmed subscribers only.
 ## Welcome email
 Subject: Welcome to BuildMyBeast — let's plan your project
 
-Thanks for joining BuildMyBeast.
+Welcome to BuildMyBeast! Let's turn your next vehicle idea into a project you can plan.
 
 Start with your vehicle, choose your upgrade direction, and save your project to My Garage. You can rename it, make a copy, and compare different budgets.
 
 Open the planner: https://buildmybeast.com/#builder
 Explore real member builds: https://buildmybeast.com/builds/
 Use the free project workbook: https://buildmybeast.com/resources/build-workbook.html
+
+Already building something? Submit your vehicle photos and modifications for gallery review: https://buildmybeast.com/#submitBuild
 
 The planner provides estimates. Use the workbook to record real quotes and confirm exact part fitment before buying.
 
@@ -38,7 +40,9 @@ Want your own vehicle featured? Submit a photo you own and your modification lis
 — BuildMyBeast
 
 ## Setup checklist
-- Add a welcome sequence in Kit and connect it to the confirmed signup flow.
+- Create a one-email welcome sequence using the subject and body above. Send immediately after confirmed subscription.
+- Connect the website signup form to that sequence; retain the confirmation requirement.
+- Apply it to future confirmed subscribers. Do not broadcast it to existing subscribers as part of this setup.
 - Keep Kit's unsubscribe footer.
 - Test formatting, sender, confirmation, and links with an authorized test subscriber.
 - Do not email unconfirmed addresses or manually claim signup attempts are confirmed.
