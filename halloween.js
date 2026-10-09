@@ -14,9 +14,29 @@
     .halloween-spotlight{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center;border:1px solid #7a4234;border-radius:18px;padding:24px;margin-bottom:24px;background:linear-gradient(135deg,#231024,#18110c)}
     .halloween-spotlight img{width:100%;height:auto;border-radius:12px;display:block}
     .halloween-spotlight p{color:var(--muted);line-height:1.6}
+    .bmb-halloween body{isolation:isolate}
+    .halloween-atmosphere{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;contain:strict}
+    .halloween-fog{position:absolute;left:-25%;bottom:-10%;width:150%;height:42%;background:radial-gradient(ellipse at 30% 80%,#ae7ac51a,transparent 60%),radial-gradient(ellipse at 70% 60%,#ff8b551c,transparent 55%);animation:bmb-fog 28s ease-in-out infinite alternate}
+    .halloween-fog.fog-back{bottom:15%;opacity:.6;animation-duration:37s;animation-delay:-15s}
+    .halloween-ember{position:absolute;left:var(--x);bottom:-12px;width:3px;height:3px;border-radius:50%;background:#ffa35b;box-shadow:0 0 8px #ff6b22;animation:bmb-ember var(--duration) linear infinite;animation-delay:var(--delay)}
+    .halloween-bat{position:absolute;left:-90px;top:var(--y);width:48px;height:24px;color:#b392bb;opacity:.28;animation:bmb-bat var(--duration) linear infinite;animation-delay:var(--delay)}
+    .halloween-bat svg{display:block;width:100%;height:100%;animation:bmb-flap .7s ease-in-out infinite alternate}
+    @keyframes bmb-fog{from{transform:translate3d(-5%,0,0)}to{transform:translate3d(8%,-8%,0)}}
+    @keyframes bmb-ember{0%{transform:translate3d(0,0,0);opacity:0}10%{opacity:.55}80%{opacity:.35}100%{transform:translate3d(55px,-105vh,0);opacity:0}}
+    @keyframes bmb-bat{0%{transform:translate3d(0,0,0)}50%{transform:translate3d(55vw,-35px,0)}100%{transform:translate3d(calc(100vw + 180px),15px,0)}}
+    @keyframes bmb-flap{from{transform:scaleY(.6)}to{transform:scaleY(1)}}
+    .bmb-halloween.bmb-motion-paused .halloween-atmosphere *{animation-play-state:paused!important}
+    @media(max-width:850px){.halloween-ember:nth-of-type(n+9),.halloween-bat:last-child{display:none}}
+    @media(prefers-reduced-motion:reduce){.halloween-atmosphere{display:none}}
     @media(max-width:850px){.halloween-spotlight{grid-template-columns:1fr;padding:18px}.bmb-halloween .visual{background-position:70% center}}
-    @media print{.halloween-spotlight{display:none}}
+    @media print{.halloween-spotlight,.halloween-atmosphere{display:none}}
   `;
+  const atmosphere = document.createElement('div');
+  atmosphere.className = 'halloween-atmosphere';
+  atmosphere.setAttribute('aria-hidden', 'true');
+  atmosphere.innerHTML = '<div class="halloween-fog"></div><div class="halloween-fog fog-back"></div>' +
+    Array.from({length:12}, (_, i) => `<span class="halloween-ember" style="--x:${(i * 37 + 7) % 100}%;--duration:${18 + i % 5 * 3}s;--delay:-${i * 4}s"></span>`).join('') +
+    Array.from({length:3}, (_, i) => `<span class="halloween-bat" style="--y:${12 + i * 25}%;--duration:${32 + i * 9}s;--delay:-${i * 13}s"><svg viewBox="0 0 80 40" fill="currentColor" focusable="false"><path d="M40 16 35 9 34 18C24 8 13 5 2 4L10 25 19 20 25 31 33 27 40 37 47 27 55 31 61 20 70 25 78 4C67 5 56 8 46 18L45 9Z"/></svg></span>`).join('');
   const spotlight = document.createElement('article');
   spotlight.className = 'halloween-spotlight';
   spotlight.innerHTML = `<div><div class="eyebrow">🎃 October spotlight · Halloween concept</div><h3>Monster Builds</h3><p>A purple ’68 Chevy Nova with blood-splatter paint, glowing headlights, pumpkins and fog. What would your Halloween getaway vehicle look like?</p><div class="actions"><a class="btn" href="#builder">Plan Your Monster Build</a><a class="btn ghost" href="#submitBuild">Submit Your Real Ride</a></div><p class="mini">AI concept artwork inspired by a model car. Member photos below are reviewed before publication.</p></div><img src="assets/halloween-nova-2026.webp" alt="Halloween concept of a purple 1968 two-door Chevrolet Nova with red splatter paint and glowing pumpkins" loading="lazy" width="1672" height="941">`;
@@ -36,6 +56,7 @@
     document.documentElement.classList.toggle('bmb-halloween', enabled);
     if (enabled) {
       document.head.append(style);
+      document.body.prepend(atmosphere);
       replace('.hero .eyebrow', {after:'🎃 Build My Beast · Halloween Edition'});
       replace('.hero h1', {after:'UNLEASH<br>THE MONSTER.'});
       replace('.hero p', {after:'Build something wicked. Plan your upgrades, estimate your budget, and research parts for your Halloween getaway vehicle—or your next everyday beast.'});
@@ -47,10 +68,16 @@
       original.splice(0).reverse().forEach(restore => restore());
       style.remove();
       spotlight.remove();
+      atmosphere.remove();
     }
   }
   sync();
   // Also restore the original on a page left open across the cutoff.
   setInterval(sync, 60000);
-  document.addEventListener('visibilitychange', sync);
+  function visibility() {
+    document.documentElement.classList.toggle('bmb-motion-paused', document.hidden);
+    sync();
+  }
+  visibility();
+  document.addEventListener('visibilitychange', visibility);
 })();
